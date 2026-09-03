@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #67E45B;
+  --color-secondary: #F3F5F8;
+  --color-tertiary: #8B939F;
+  --color-background: #0A0D12;
+  --color-background-secondary: #0D1117;
+  
+  --font-sans: var(--font-geist-sans), 'Geist Fallback';
+  --font-mono: var(--font-geist-mono), 'Geist Mono Fallback';
+}
+
+@layer utilities {
+  .btn-glow {
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  .btn-glow:hover {
+    box-shadow: 
+      0 0 10px rgba(103, 228, 91, 0.4),
+      0 0 20px rgba(103, 228, 91, 0.3),
+      0 0 30px rgba(103, 228, 91, 0.2),
+      0 0 40px rgba(103, 228, 91, 0.1),
+      inset 0 0 10px rgba(103, 228, 91, 0.1);
+  }
+}
