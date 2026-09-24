@@ -1,4 +1,7 @@
-import React from 'react';
+import { ArrowUpRight, Heart, MessageCircle } from 'lucide-react';
+import ds3Cover from '../../assets/covers/ds3_cover.png';
+import eldenRingCover from '../../assets/covers/EldenRing_Cover.png';
+import minecraftCover from '../../assets/covers/minecraft_cover.png';
 
 export default function PopularReviews() {
   const reviews = [
@@ -6,7 +9,7 @@ export default function PopularReviews() {
       id: 1,
       title: "Dark Souls",
       year: "2025",
-      image: "https://images.unsplash.com",
+      image: ds3Cover,
       user: "Nova",
       initial: "N",
       avatarColor: "bg-emerald-500",
@@ -19,7 +22,7 @@ export default function PopularReviews() {
       id: 2,
       title: "Shadow Realm",
       year: "2023",
-      image: "https://images.unsplash.com",
+      image: eldenRingCover,
       user: "Lena",
       initial: "L",
       avatarColor: "bg-cyan-500",
@@ -32,7 +35,7 @@ export default function PopularReviews() {
       id: 3,
       title: "Star Drift",
       year: "2024",
-      image: "https://images.unsplash.com",
+      image: minecraftCover,
       user: "Kai",
       initial: "K",
       avatarColor: "bg-teal-500",
@@ -44,28 +47,31 @@ export default function PopularReviews() {
   ];
 
   return (
-    <section className="w-full px-4 sm:px-8 lg:px-16 py-10 sm:py-12 bg-background text-secondary font-sans select-none">
-      <div className="max-w-6xl mx-auto space-y-4">
+    <section className="w-full px-4 sm:px-8 lg:px-12 xl:px-16 py-12 bg-background text-secondary font-sans select-none">
+      <div className="max-w-6xl mx-auto">
       
       {/* Encabezado de la sección */}
-      <div className="flex items-center justify-between gap-3 mb-6">
-        <h3 className="text-xs font-bold tracking-wider text-zinc-400 uppercase">
-          Reseñas populares de la semana
-        </h3>
-        <a href="#" className="text-xs text-zinc-500 hover:text-secondary flex items-center gap-1 transition-colors">
-          More <span className="text-[10px]">&gt;</span>
+      <div className="flex items-end justify-between gap-4 mb-6">
+        <div>
+          <p className="text-[10px] font-bold tracking-[0.2em] text-primary uppercase mb-1">La comunidad opina</p>
+          <h3 className="text-xl sm:text-2xl font-black tracking-tight text-secondary">
+            Reseñas populares
+          </h3>
+        </div>
+        <a href="#" className="text-xs font-semibold text-zinc-400 hover:text-primary flex items-center gap-1 transition-colors shrink-0">
+          Ver más <ArrowUpRight className="w-3.5 h-3.5" />
         </a>
       </div>
 
       {/* Lista de Reseñas */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {reviews.map((review) => (
           <div 
             key={review.id} 
-            className="group flex flex-col sm:flex-row gap-4 sm:gap-5 bg-background-secondary border border-tertiary/15 rounded-xl p-4 sm:p-5 hover:border-tertiary/50 transition-all duration-200"
+            className="group flex flex-col sm:flex-row gap-5 sm:gap-5 bg-background-secondary border border-white/[0.07] rounded-2xl p-5 sm:p-5 hover:border-primary/35 hover:bg-[#10161b] transition-all duration-300"
           >
             {/* Imagen del Juego con Zoom en Hover */}
-            <div className="w-full h-44 sm:w-24 sm:h-32 md:w-28 md:h-36 shrink-0 rounded-lg overflow-hidden border border-zinc-800 bg-zinc-900">
+            <div className="w-full h-56 sm:aspect-3/4 sm:w-24 md:w-28 sm:h-32 md:h-36 shrink-0 rounded-xl overflow-hidden border border-white/8 bg-zinc-900">
               <img 
                 src={review.image} 
                 alt={review.title} 
@@ -77,11 +83,11 @@ export default function PopularReviews() {
             <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
               <div>
                 {/* Título y Año */}
-                <div className="flex items-baseline gap-2 mb-1.5 flex-wrap">
-                  <h4 className="text-base sm:text-lg font-black tracking-tight text-white group-hover:text-primary transition-colors duration-300">
+                <div className="flex items-baseline gap-2 mb-2 flex-wrap">
+                  <h4 className="text-xl sm:text-xl font-black tracking-tight text-white group-hover:text-primary transition-colors duration-300">
                     {review.title}
                   </h4>
-                  <span className="text-xs font-medium text-tertiary/60">
+                  <span className="text-[11px] font-bold text-tertiary/60 border border-white/8 rounded-full px-2 py-0.5">
                     {review.year}
                   </span>
                 </div>
@@ -89,15 +95,15 @@ export default function PopularReviews() {
                 {/* Fila del Usuario y Calificación */}
                 <div className="flex items-center gap-2 mb-3 flex-wrap">
                   {/* Avatar Circular */}
-                  <div className={`w-5 h-5 rounded-full ${review.avatarColor} flex items-center justify-center text-[11px] font-black text-black shrink-0`}>
+                  <div className={`w-6 h-6 rounded-full ${review.avatarColor} flex items-center justify-center text-[11px] font-black text-black shrink-0 ring-2 ring-background-secondary`}>
                     {review.initial}
                   </div>
                   {/* Nombre de Usuario */}
-                  <span className="text-xs sm:text-sm font-bold text-secondary/70">
+                  <span className="text-sm sm:text-sm font-bold text-secondary/80">
                     {review.user}
                   </span>
                   {/* Estrellas */}
-                  <div className="flex text-xs tracking-tight ml-1">
+                  <div className="flex text-xs tracking-tight ml-1 bg-background px-2 py-1 rounded-full">
                     {[...Array(5)].map((_, i) => (
                       <span 
                         key={i} 
@@ -110,26 +116,22 @@ export default function PopularReviews() {
                 </div>
 
                 {/* Texto de la Reseña */}
-                <p className="text-tertiary/90 text-xs sm:text-sm leading-relaxed max-w-3xl line-clamp-3 sm:line-clamp-2 lg:line-clamp-none">
+                <p className="text-sm sm:text-sm text-tertiary/90 leading-relaxed max-w-3xl line-clamp-4 lg:line-clamp-2">
                   {review.comment}
                 </p>
               </div>
 
               {/* Botones de Interacción Inferiores (Likes y Respuestas) */}
-              <div className="flex items-center gap-4 text-xs font-semibold text-tertiary mt-4 flex-wrap">
+              <div className="flex items-center gap-4 text-xs font-semibold text-tertiary mt-4 pt-3 border-t border-white/6 flex-wrap">
                 {/* Corazón / Likes */}
-                <button className="flex items-center gap-1.5 hover:text-rose-500 transition-colors group/btn">
-                  <svg className="w-4 h-4 stroke-current fill-transparent group-hover/btn:fill-rose-500/20 transition-all" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
-                  </svg>
+                <button className="flex items-center gap-1.5 hover:text-rose-400 transition-colors group/btn">
+                  <Heart className="w-4 h-4 group-hover/btn:fill-rose-400/20 transition-all" />
                   <span>{review.likes}</span>
                 </button>
 
                 {/* Globo de Diálogo / Comentarios */}
                 <button className="flex items-center gap-1.5 hover:text-primary transition-colors group/btn">
-                  <svg className="w-4 h-4 stroke-current fill-transparent group-hover/btn:fill-cyan-400/10 transition-all" viewBox="0 0 24 24" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-                  </svg>
+                  <MessageCircle className="w-4 h-4 group-hover/btn:fill-primary/10 transition-all" />
                   <span>{review.replies}</span>
                 </button>
               </div>

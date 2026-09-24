@@ -12,7 +12,7 @@ const Home = () => {
     <div className="flex w-full">
       <Sidebar />
 
-      <div className="flex-1 flex flex-col">
+      <div className="flex-1 min-w-0 flex flex-col">
           <header className="sticky top-0 z-30 bg-background">
               <SearchBar />
           </header>

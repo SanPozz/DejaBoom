@@ -10,10 +10,10 @@ const FormLogIn = () => {
   }
 
   return (
-    <div className="w-1/2 flex items-center justify-center px-12">
+    <div className="flex w-full items-center justify-center px-6 py-12 sm:px-12 lg:w-1/2 lg:py-0">
       <form onSubmit={handleSubmit} className="w-full max-w-md">
         
-        <h2 className="text-3xl font-bold text-white mb-8">Iniciar Sesión</h2>
+        <h2 className="mb-6 text-2xl font-bold text-white sm:mb-8 sm:text-3xl">Iniciar Sesión</h2>
 
         
         <div className="mb-6">
