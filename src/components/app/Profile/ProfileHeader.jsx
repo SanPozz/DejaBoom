@@ -1,11 +1,19 @@
-import React from 'react'
-import { Edit3, Clock, UserIcon } from 'lucide-react'
+import { Edit3, UserIcon } from 'lucide-react'
+import { Link } from 'react-router-dom'
 
 export default function ProfileHeader({ profile }) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-end gap-4 sm:gap-6 mb-8">
-      <div className="relative -mt-16 sm:-mt-20 md:-mt-24">
-        <UserIcon size={40} className="w-28 sm:w-32 md:w-40 h-28 sm:h-32 md:h-40 rounded-full border-4 border-background object-cover text-primary"/>
+      <div className="relative -mt-16 sm:-mt-20 md:-mt-24 grid h-28 w-28 place-items-center rounded-full border-4 border-background bg-background-secondary text-primary sm:h-32 sm:w-32 md:h-40 md:w-40">
+        <UserIcon size={40} />
+        {profile.avatar && (
+          <img
+            src={profile.avatar}
+            alt={`${profile.name} avatar`}
+            onError={(event) => event.currentTarget.classList.add("hidden")}
+            className="absolute inset-0 h-full w-full rounded-full object-cover"
+          />
+        )}
       </div>
 
       <div className="flex-1">
@@ -18,10 +26,10 @@ export default function ProfileHeader({ profile }) {
               {profile.username}
             </p>
           </div>
-          <button className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 rounded-lg bg-primary text-background font-semibold hover:opacity-90 transition-all w-full sm:w-auto btn-glow cursor-pointer">
+          <Link to="/profile/edit" className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2 rounded-lg bg-primary text-background font-semibold hover:opacity-90 transition-all w-full sm:w-auto btn-glow cursor-pointer">
             <Edit3 size={18} />
             Editar Perfil
-          </button>
+          </Link>
         </div>
 
         <p className="text-tertiary text-sm md:text-base mb-3 line-clamp-2 font-light">

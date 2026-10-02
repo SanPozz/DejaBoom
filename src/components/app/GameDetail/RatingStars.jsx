@@ -24,20 +24,6 @@ const RatingStars = ({ rating, onRatingChange, size = "lg" }) => {
     setHoverRating(isLeftHalf ? starIndex - 0.5 : starIndex)
   }
 
-  const renderStar = (starIndex) => {
-    const displayRating = hoverRating || rating
-    const isFilled = starIndex <= displayRating
-    const isHalfFilled = starIndex - 0.5 === displayRating
-
-    if (isFilled) {
-      return "fill-primary text-primary"
-    } else if (isHalfFilled) {
-      return "fill-primary text-primary"
-    } else {
-      return "text-tertiary/40"
-    }
-  }
-
   return (
     <div className="flex gap-2">
       {Array.from({ length: 5 }).map((_, index) => {
@@ -45,11 +31,15 @@ const RatingStars = ({ rating, onRatingChange, size = "lg" }) => {
         const displayRating = hoverRating || rating
         const isFilled = starIndex <= displayRating
         const isHalfFilled = starIndex - 0.5 === displayRating
+        const isActive = isFilled || isHalfFilled
+        const glowClass = hoverRating
+          ? "drop-shadow-[0_0_11px_rgba(103,228,91,0.72)]"
+          : "drop-shadow-[0_0_6px_rgba(103,228,91,0.48)]"
 
         return (
           <div
             key={index}
-            className="relative cursor-pointer transition-transform duration-200 hover:scale-110"
+            className={`relative cursor-pointer transition-all duration-200 hover:scale-110 focus-visible:rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 ${isActive ? glowClass : ""}`}
             onMouseMove={(e) => handleStarHover(starIndex, e)}
             onMouseLeave={() => setHoverRating(0)}
             onClick={(e) => handleStarClick(starIndex, e)}

@@ -1,8 +1,8 @@
-import React from "react"
 import { BookmarkPlus, Check, Gamepad2, Sparkles } from "lucide-react"
 import { Link } from "react-router-dom"
 import Sidebar from "../components/app/Sidebar"
 import SearchBar from "../components/app/SearchBar"
+import { getSavedLists } from "../utils/listsStorage"
 
 const myLists = [
   {
@@ -100,6 +100,12 @@ const myLists = [
 const filters = ["Todas", "Públicas", "Privadas", "Favoritas"]
 
 const Lists = () => {
+  const savedLists = getSavedLists()
+  const lists = myLists.map((list) => {
+    const savedList = savedLists.find((item) => String(item.id) === String(list.id))
+    return savedList ? { ...list, ...savedList } : list
+  }).concat(savedLists.filter((list) => !myLists.some((item) => String(item.id) === String(list.id))))
+
   return (
     <div className="flex w-full min-h-screen bg-background text-secondary">
       <Sidebar />
@@ -119,10 +125,10 @@ const Lists = () => {
                 <h1 className="text-3xl sm:text-4xl font-bold text-secondary">Mis Listas</h1>
               </div>
 
-              <button className="inline-flex items-center justify-center gap-2 bg-primary text-black font-bold px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
+              <Link to="/lists/new" className="inline-flex items-center justify-center gap-2 bg-primary text-black font-bold px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
                 <BookmarkPlus size={18} />
                 Nueva lista
-              </button>
+              </Link>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
@@ -131,7 +137,7 @@ const Lists = () => {
                   <Gamepad2 size={18} className="text-primary" />
                   <span className="text-xs uppercase tracking-[0.18em]">Total</span>
                 </div>
-                <p className="text-3xl font-bold text-secondary">{myLists.length}</p>
+                <p className="text-3xl font-bold text-secondary">{lists.length}</p>
                 <p className="text-sm text-tertiary mt-1">listas creadas</p>
               </div>
 
@@ -170,7 +176,7 @@ const Lists = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {myLists.map((list) => (
+              {lists.map((list) => (
                 <article
                   key={list.id}
                   className="group bg-background-secondary border border-tertiary/15 rounded-2xl overflow-hidden hover:border-primary/35 transition-all duration-300"
@@ -186,7 +192,7 @@ const Lists = () => {
 
                   <div className="px-4 pb-3 pt-3">
                     <div className="flex -space-x-4 mb-4 overflow-hidden">
-                      {list.covers.map((cover, index) => (
+                      {(list.covers ?? []).map((cover, index) => (
                         <div
                           key={`${list.id}-${index}`}
                           className="w-16 h-20 rounded-lg overflow-hidden border-2 border-background-secondary ring-1 ring-white/5 shadow-lg shrink-0"
@@ -208,7 +214,7 @@ const Lists = () => {
                   <div className="flex items-center justify-between px-4 pb-4 pt-1">
                     <div>
                       <p className="text-xs text-tertiary">por {list.author}</p>
-                      <p className="text-xs font-medium text-secondary mt-1">{list.count} juegos</p>
+                      <p className="text-xs font-medium text-secondary mt-1">{list.games?.length ?? list.count} juegos</p>
                     </div>
 
                     <Link

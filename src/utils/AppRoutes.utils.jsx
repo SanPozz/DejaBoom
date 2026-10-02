@@ -8,8 +8,11 @@ import Register from "../pages/Register"
 import Home from "../pages/Home"
 import GameDetail from "../pages/GameDetail"
 import Profile from "../pages/Profile"
+import EditProfile from "../pages/EditProfile"
 import Lists from "../pages/Lists"
 import ListDetail from "../pages/ListDetail"
+import ListForm from "../pages/ListForm"
+import NotFound from "../pages/NotFound"
 
 
 const AppRoutes = () => {
@@ -23,10 +26,13 @@ const AppRoutes = () => {
       <Route path="/home" element={<Home />} />
       <Route path="/game/:id" element={<GameDetail />} />
       <Route path="/profile" element={<Profile />} />
+      <Route path="/profile/edit" element={<EditProfile />} />
       <Route path="/lists" element={<Lists />} />
+      <Route path="/lists/new" element={<ListForm />} />
+      <Route path="/lists/:id/edit" element={<ListForm />} />
       <Route path="/lists/:id" element={<ListDetail />} />
 
-      <Route path="*" element={<div>404 Not Found</div>} />
+      <Route path="*" element={<NotFound />} />
     </Routes>
   )
 }

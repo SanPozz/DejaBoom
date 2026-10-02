@@ -1,5 +1,4 @@
-import React from "react"
-import { MessageSquare, Bookmark, Gamepad2, Trophy } from "lucide-react"
+import { MessageSquare, Bookmark } from "lucide-react"
 import Sidebar from "../components/app/Sidebar"
 import ProfileHeader from "../components/app/Profile/ProfileHeader"
 import ProfileStats from "../components/app/Profile/ProfileStats"
@@ -7,16 +6,10 @@ import FavoriteGames from "../components/app/Profile/FavoriteGames"
 import RecentReviews from "../components/app/Profile/RecentReviews"
 import ActivitySidebar from "../components/app/Profile/ActivitySidebar"
 import UserLists from "../components/app/Profile/UserLists"
+import { getProfile } from "../utils/profileStorage"
 
 const Profile = () => {
-  const userProfile = {
-    name: "User Example",
-    username: "@userexample",
-    bio: "lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    avatar: "https://unsplash.com",
-    bannerImage: "https://unsplash.com",
-    joinedDate: "Agosto 2023",
-  }
+  const userProfile = getProfile()
 
   const stats = [
     { icon: MessageSquare, label: "Reseñas", value: 142, color: "text-primary" },
@@ -45,7 +38,7 @@ const Profile = () => {
         {/* Banner */}
         <div className="relative h-32 sm:h-40 md:h-48 lg:h-56 w-full overflow-hidden bg-background-secondary">
           <img src={userProfile.bannerImage} alt="Banner" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/90 to-transparent" />
+          <div className="absolute inset-0 bg-linear-to-t from-background/90 to-transparent" />
         </div>
 
         {/* Main Content */}

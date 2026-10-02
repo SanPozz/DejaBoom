@@ -1,17 +1,19 @@
-import React from "react"
 import logo from "../../assets/dejaboompng.png"
-import { LogOut, Home, Compass, List, Bell, Plus } from "lucide-react"
+import { LogOut, Home, Compass, List, Plus } from "lucide-react"
+import { useState } from "react"
 import { Link, useLocation } from "react-router-dom"
+import NotificationsPopover from "./NotificationsPopover"
+import NewReviewModal from "./NewReviewModal"
 
 const linksSidebar = [
   { name: "Inicio", path: "/home", icon: <Home size={20} /> },
   { name: "Descubrir", path: "", icon: <Compass size={20} /> },
   { name: "Mis Listas", path: "/lists", icon: <List size={20} /> },
-  { name: "Notificaciones", path: "", icon: <Bell size={20} /> },
 ]
 
 const Sidebar = () => {
   const location = useLocation() // Nos permite detectar la página actual para pintar el enlace activo
+  const [isNewReviewModalOpen, setIsNewReviewModalOpen] = useState(false)
 
   return (
     <>
@@ -34,9 +36,16 @@ const Sidebar = () => {
             </Link>
           );
         })}
+
+        <div className="w-auto">
+          <NotificationsPopover />
+        </div>
         
         {/* Botón flotante compacto de Nueva Reseña en móvil */}
-        <button className="bg-[color:var(--color-primary)] p-2.5 rounded-full text-black shadow-lg shadow-[color:var(--color-primary)]/20 active:scale-95 transition-transform cursor-pointer -translate-y-4 border-4 border-[color:var(--color-background)]">
+        <button
+          onClick={() => setIsNewReviewModalOpen(true)}
+          className="bg-[color:var(--color-primary)] p-2.5 rounded-full text-black shadow-lg shadow-[color:var(--color-primary)]/20 active:scale-95 transition-transform cursor-pointer -translate-y-4 border-4 border-[color:var(--color-background)]"
+        >
           <Plus size={20} strokeWidth={3} />
         </button>
       </div>
@@ -73,10 +82,14 @@ const Sidebar = () => {
                   </Link>
                 );
               })}
+              <NotificationsPopover />
             </div>
 
             {/* Botón Nueva Reseña */}
-            <button className="w-full bg-[color:var(--color-primary)] py-2.5 mt-6 rounded-xl text-black font-bold hover:opacity-90 shadow-md shadow-[color:var(--color-primary)]/10 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2 text-sm ">
+            <button
+              onClick={() => setIsNewReviewModalOpen(true)}
+              className="w-full bg-[color:var(--color-primary)] py-2.5 mt-6 rounded-xl text-black font-bold hover:opacity-90 shadow-md shadow-[color:var(--color-primary)]/10 active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-2 text-sm "
+            >
               <Plus size={16} strokeWidth={2.5} />
               <span>Nueva Reseña</span>
             </button>
@@ -95,6 +108,11 @@ const Sidebar = () => {
         </nav>
 
       </aside>
+
+      <NewReviewModal
+        isOpen={isNewReviewModalOpen}
+        onClose={() => setIsNewReviewModalOpen(false)}
+      />
     </>
   )
 }

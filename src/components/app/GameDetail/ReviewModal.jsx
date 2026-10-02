@@ -36,13 +36,13 @@ const ReviewModal = ({ isOpen, onClose, gameName = "Juego" }) => {
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-background-secondary border border-tertiary rounded-2xl max-w-md w-full shadow-2xl">
+      <div className="bg-background-secondary border border-primary/35 rounded-2xl max-w-md w-full shadow-[0_0_0_1px_rgba(103,228,91,0.08),0_24px_80px_rgba(0,0,0,0.65),0_0_36px_rgba(103,228,91,0.14)]">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-tertiary/30">
+        <div className="flex items-center justify-between p-6 border-b border-primary/20">
           <h2 className="text-lg font-bold text-secondary">Reseña de {gameName}</h2>
           <button
             onClick={handleClose}
-            className="p-2 hover:bg-primary/10 rounded-lg text-tertiary hover:text-primary transition-all"
+            className="cursor-pointer p-2 hover:bg-primary/10 rounded-lg text-tertiary hover:text-primary transition-all"
             aria-label="Cerrar"
           >
             <X size={20} />
@@ -70,7 +70,7 @@ const ReviewModal = ({ isOpen, onClose, gameName = "Juego" }) => {
               placeholder="Comparte tu experiencia con este juego..."
               rows={4}
               maxLength={500}
-              className="w-full bg-background border border-tertiary/30 rounded-lg px-3 py-2 text-secondary placeholder-tertiary/50 focus:border-primary focus:outline-none resize-none transition-colors"
+              className="w-full bg-background border border-primary/25 rounded-lg px-3 py-2 text-secondary placeholder-tertiary/50 focus:border-primary focus:ring-1 focus:ring-primary/30 focus:outline-none resize-none transition-colors"
             />
             <div className="mt-1 text-xs text-tertiary text-right">
               {comment.length}/500
@@ -82,14 +82,14 @@ const ReviewModal = ({ isOpen, onClose, gameName = "Juego" }) => {
             <button
               type="button"
               onClick={handleClose}
-              className="flex-1 px-4 py-2 rounded-lg border border-tertiary/30 text-secondary hover:border-tertiary hover:bg-tertiary/5 transition-all font-semibold"
+              className="cursor-pointer flex-1 px-4 py-2 rounded-lg border border-primary/30 text-secondary hover:border-primary hover:bg-primary/5 transition-all font-semibold"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
-              className="flex-1 px-4 py-2 rounded-lg bg-primary text-background font-semibold hover:bg-primary/90 transition-all disabled:opacity-50 cursor-pointer"
+              className="flex-1 px-4 py-2 rounded-lg bg-primary text-background font-semibold hover:bg-primary/90 hover:shadow-[0_0_22px_rgba(103,228,91,0.28)] transition-all disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer"
             >
               {isSubmitting ? "Enviando..." : "Enviar reseña"}
             </button>

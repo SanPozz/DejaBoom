@@ -1,8 +1,10 @@
-import { ArrowLeft, Bookmark, CalendarClock, Gamepad2, Sparkles } from "lucide-react"
+import { ArrowLeft, Bookmark, CalendarClock, Gamepad2, Pencil, Sparkles } from "lucide-react"
 import { Link, useParams } from "react-router-dom"
 import Sidebar from "../components/app/Sidebar"
 import SearchBar from "../components/app/SearchBar"
 import ListItem from "../components/app/ListItem"
+import { getSavedLists } from "../utils/listsStorage"
+import { listEditorSeeds } from "../data/listEditorData"
 
 const listDetails = [
   {
@@ -78,7 +80,10 @@ const listDetails = [
 
 const ListDetail = () => {
   const { id } = useParams()
-  const list = listDetails.find((item) => String(item.id) === String(id))
+  const savedList = getSavedLists().find((item) => String(item.id) === String(id))
+  const summary = listEditorSeeds.find((item) => String(item.id) === String(id))
+  const details = listDetails.find((item) => String(item.id) === String(id))
+  const list = savedList ?? (summary ? { ...summary, ...details, games: details?.games ?? [] } : null)
 
   if (!list) {
     return (
@@ -147,7 +152,7 @@ const ListDetail = () => {
                     <Sparkles size={16} className="text-primary" />
                     <span className="text-[10px] uppercase tracking-[0.18em]">Mood</span>
                   </div>
-                  <p className="text-xl font-bold text-secondary">{list.mood}</p>
+                  <p className="text-xl font-bold text-secondary">{list.mood ?? "Personalizada"}</p>
                 </div>
 
                 <div className="rounded-2xl border border-tertiary/15 bg-background/80 p-4">
@@ -155,7 +160,7 @@ const ListDetail = () => {
                     <CalendarClock size={16} className="text-primary" />
                     <span className="text-[10px] uppercase tracking-[0.18em]">Creada</span>
                   </div>
-                  <p className="text-xl font-bold text-secondary">{list.createdAt}</p>
+                  <p className="text-xl font-bold text-secondary">{list.createdAt ?? "Reciente"}</p>
                 </div>
               </div>
             </section>
@@ -165,10 +170,16 @@ const ListDetail = () => {
                 <p className="text-[10px] uppercase tracking-[0.2em] text-tertiary">Lista de {list.author}</p>
               </div>
 
-              <button className="inline-flex items-center gap-2 bg-primary text-black font-bold px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
+              <div className="flex items-center gap-3">
+                <Link to={`/lists/${list.id}/edit`} className="inline-flex items-center gap-2 border border-tertiary/25 text-secondary font-bold px-4 py-2.5 rounded-xl hover:border-primary/50 transition-colors">
+                  <Pencil size={16} />
+                  Editar lista
+                </Link>
+                <button className="inline-flex items-center gap-2 bg-primary text-black font-bold px-4 py-2.5 rounded-xl hover:opacity-90 transition-opacity shadow-lg shadow-primary/20">
                 <Bookmark size={16} />
                 Guardar lista
-              </button>
+                </button>
+              </div>
             </section>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
