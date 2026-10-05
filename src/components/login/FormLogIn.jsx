@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 import { useState } from "react";
-import { setToken } from "../../utils/auth";
 import GoogleSignInButton from "./GoogleSignInButton";
 
 
@@ -21,11 +20,6 @@ const FormLogIn = () => {
         email,
         password
       });
-
-      const token = response.data?.token || response.data?.accessToken || response.data?.jwt
-      if (token) {
-        setToken(token)
-      }
 
       console.log(response.data);
       navigate('/home');

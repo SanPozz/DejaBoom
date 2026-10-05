@@ -50,7 +50,7 @@ export default function PopularLists() {
       {/* Encabezado */}
       <div className="max-w-6xl mx-auto">
         <div className="flex items-end justify-between gap-4 mb-5">
-          <div>
+          <div className='pt-8'>
             <p className="text-[10px] font-bold tracking-[0.2em] text-primary uppercase mb-1">Descubre</p>
             <h3 className="text-xl sm:text-2xl font-black tracking-tight text-secondary">
               Listas populares
@@ -61,19 +61,19 @@ export default function PopularLists() {
           </a>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 2xl:grid-cols-3 gap-3 sm:gap-4">
           {lists.map((list) => (
             <article
               key={list.id}
               className="group bg-background-secondary border border-white/[0.07] rounded-2xl p-5 sm:p-4 hover:border-primary/40 hover:-translate-y-1 transition-all duration-300 cursor-pointer"
             >
-              <div className="flex gap-4 mb-5">
-                <div className="flex -space-x-8 pl-1 pt-1 min-w-33 h-27 sm:h-23">
+              <div className="flex gap-3 sm:gap-4 mb-5">
+                <div className="flex -space-x-6 pl-1 pt-1 w-32 sm:w-40 h-19 sm:h-21 shrink-0">
                   {list.covers.map((cover, index) => (
                     <div
                       key={index}
                       style={{ zIndex: list.covers.length - index, transform: `rotate(${(index - 1.5) * 3}deg)` }}
-                      className="w-16 h-24 sm:w-14 sm:h-20 shrink-0 rounded-lg overflow-hidden border-2 border-background-secondary shadow-xl bg-zinc-900 group-hover:-translate-y-1 transition-transform duration-300"
+                      className="relative w-12 h-18 sm:w-14 sm:h-20 shrink-0 rounded-lg overflow-hidden border-2 border-background-secondary shadow-xl bg-zinc-900 group-hover:-translate-y-1 transition-transform duration-300"
                     >
                       <img src={cover} alt="Portada de videojuego" className="w-full h-full object-cover" />
                     </div>

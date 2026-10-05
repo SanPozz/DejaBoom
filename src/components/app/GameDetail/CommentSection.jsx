@@ -42,7 +42,7 @@ export default function SeccionComentarios({
 
   return (
     /* CONTENEDOR CLAVE: 'max-w-3xl' evita que ocupe todo el ancho de la pantalla y 'w-full' mantiene la flexibilidad */
-    <div className="w-full max-w-3xl mx-auto  space-y-6 border-t border-[color:var(--color-tertiary)]/10 pt-6 font-sans">
+    <div className="w-full max-w-3xl mx-auto space-y-6 border-t border-[color:var(--color-tertiary)]/10 px-4 pt-6 font-sans md:px-8">
       
       {/* Encabezado */}
       <div className="flex justify-between items-baseline border-b border-[color:var(--color-tertiary)]/10 pb-2">
