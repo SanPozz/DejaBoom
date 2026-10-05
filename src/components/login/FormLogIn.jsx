@@ -1,12 +1,37 @@
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom";
+
+import axios from "axios";
+
+import { useState } from "react";
+import { setToken } from "../../utils/auth";
+import GoogleSignInButton from "./GoogleSignInButton";
+
 
 const FormLogIn = () => {
 
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate('/home');
+    try {
+      const response = await axios.post('http://localhost:3000/api/auth/login', {
+        email,
+        password
+      });
+
+      const token = response.data?.token || response.data?.accessToken || response.data?.jwt
+      if (token) {
+        setToken(token)
+      }
+
+      console.log(response.data);
+      navigate('/home');
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   return (
@@ -24,6 +49,8 @@ const FormLogIn = () => {
             id="email" 
             type="email" 
             placeholder="email@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full px-4 py-3 bg-background-secondary border border-tertiary rounded-lg text-white placeholder-tertiary/50 focus:outline-none focus:border-primary transition-colors duration-300"
           />
         </div>
@@ -37,6 +64,8 @@ const FormLogIn = () => {
             id="password" 
             type="password" 
             placeholder="*******"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full px-4 py-3 bg-background-secondary border border-tertiary rounded-lg text-white placeholder-tertiary/50 focus:outline-none focus:border-primary transition-colors duration-300"
           />
         </div>
@@ -48,6 +77,14 @@ const FormLogIn = () => {
         >
           Iniciar Sesión
         </button>
+
+        <div className="my-6 flex items-center gap-4" aria-hidden="true">
+          <span className="h-px flex-1 bg-tertiary/40" />
+          <span className="text-sm text-tertiary">o</span>
+          <span className="h-px flex-1 bg-tertiary/40" />
+        </div>
+
+        <GoogleSignInButton />
 
         
         <p className="text-center text-tertiary text-sm mt-6">
