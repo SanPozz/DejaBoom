@@ -3,7 +3,10 @@ import { Link } from "react-router-dom"
 
 const SearchBar = () => {
   return (
-    <div className="w-full p-6 bg-background flex items-center justify-between border-b border-tertiary">
+    <div className="w-full p-6 bg-background flex items-center justify-between gap-4 border-b border-tertiary">
+        <Link to="/home" className="shrink-0">
+            <img src="/favicon_dejaboom.png" alt="Logo" className="h-10 w-auto" />
+        </Link>
         <div className="relative flex mx-auto items-center w-[80%]">
             <Search className="absolute left-3 text-tertiary pointer-events-none" />
             <input

@@ -18,9 +18,14 @@ const NavBar = () => {
           onClick={closeMenu}
         >
           <img
+            src='/favicon_dejaboom.png'
+            alt='Logo'
+            className='sm:hidden h-12 w-auto'
+          />
+          <img
             src={logo}
             alt='Logo'
-            className='h-12 sm:h-12 lg:h-16 w-auto'
+            className='hidden sm:block h-16 lg:h-20 w-auto'
           />
         </Link>
 
