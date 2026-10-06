@@ -15,7 +15,8 @@ const NavBar = () => {
                 <nav className='container mx-auto w-full flex items-center justify-between px-3 sm:px-6 lg:px-8 py-3 sm:py-4 font-mono min-h-20'>
 
                         <Link to="/" className='flex items-center gap-2' onClick={closeMenu}>
-                <img src={logo} alt="Logo" className='h-12 sm:h-14 lg:h-16 w-auto' />
+                <img src="/favicon_dejaboom.png" alt="Logo" className='sm:hidden h-12 w-auto' />
+                <img src={logo} alt="Logo" className='hidden sm:block h-16 lg:h-20 w-auto' />
             </Link>
 
             {/* <div className='hidden md:flex items-center gap-6 '>
