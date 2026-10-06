@@ -126,7 +126,7 @@ const Lists = () => {
           <SearchBar />
         </header>
 
-        <main className='flex-1 px-4 sm:px-6 lg:px-8 py-8 pb-20 lg:pb-0'>
+        <main className='flex-1 px-4 sm:px-6 lg:px-8 py-8 pb-20 '>
           <div className='max-w-6xl mx-auto'>
             <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8'>
               <div>
