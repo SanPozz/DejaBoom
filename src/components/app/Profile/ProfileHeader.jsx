@@ -79,6 +79,7 @@ export default function ProfileHeader({ profile }) {
               <Edit3 size={18} />
               Editar Perfil
             </Link>
+
           </div>
         </div>
 
