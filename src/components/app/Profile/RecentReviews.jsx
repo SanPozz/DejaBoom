@@ -1,4 +1,6 @@
 import React from 'react'
+import { Link } from "react-router-dom"
+
 
 export default function RecentReviews({ reviews }) {
   return (
@@ -38,9 +40,12 @@ export default function RecentReviews({ reviews }) {
         ))}
       </div>
 
-      <button className="mt-6 w-full sm:w-auto px-6 py-2 rounded-lg border border-primary text-primary font-semibold hover:bg-primary/10 transition-all text-xs uppercase tracking-wider">
+      <Link
+        to="/profile/reviews"
+        className="mt-6 inline-block w-full sm:w-auto px-6 py-2 rounded-lg border border-primary text-primary font-semibold hover:bg-primary/10 transition-all text-xs uppercase tracking-wider text-center"
+      >
         Ver Todas las Reseñas
-      </button>
+      </Link>
     </div>
   )
 }

@@ -7,6 +7,7 @@ import RecentReviews from "../components/app/Profile/RecentReviews"
 import ActivitySidebar from "../components/app/Profile/ActivitySidebar"
 import UserLists from "../components/app/Profile/UserLists"
 import { getProfile } from "../utils/profileStorage"
+import { userReviews } from "../data/reviews"
 
 const Profile = () => {
   const userProfile = getProfile()
@@ -18,11 +19,7 @@ const Profile = () => {
     // { icon: Trophy, label: "Logros", value: 24, color: "text-amber-400" },
   ]
 
-  const recentReviews = [
-    { id: 1, gameTitle: "Elden Ring", rating: 5, date: "Hace 2 días", text: "Una obra maestra absoluta. La libertad de exploración combinada con un combate desafiante es simplemente adictivo." },
-    { id: 2, gameTitle: "Baldur's Gate 3", rating: 4.5, date: "Hace 1 semana", text: "Increíble profundidad en las decisiones y personajes. Los diálogos son excelentes aunque el juego es bastante largo." },
-    { id: 3, gameTitle: "Starfield", rating: 3.5, date: "Hace 2 semanas", text: "Buen juego, pero esperaba más. La exploración espacial está bien pero necesita más variedad en los planetas." },
-  ]
+  const recentReviews = userReviews.slice(0, 3)
 
   const userLists = [
     { id: 1, title: "Mis Juegos Favoritos de RPG", games: 12, image: "https://unsplash.com" },

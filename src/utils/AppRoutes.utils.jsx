@@ -13,6 +13,7 @@ import Lists from "../pages/Lists"
 import ListDetail from "../pages/ListDetail"
 import ListForm from "../pages/ListForm"
 import NotFound from "../pages/NotFound"
+import AllReviews from "../pages/AllReviews"
 
 
 const AppRoutes = () => {
@@ -31,6 +32,7 @@ const AppRoutes = () => {
       <Route path="/lists/new" element={<ListForm />} />
       <Route path="/lists/:id/edit" element={<ListForm />} />
       <Route path="/lists/:id" element={<ListDetail />} />
+      <Route path="/profile/reviews" element={<AllReviews />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
