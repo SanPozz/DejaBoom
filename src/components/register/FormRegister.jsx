@@ -1,3 +1,6 @@
+import { auth } from "../../firebase.js";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+
 import { Link, useNavigate } from "react-router-dom"
 
 import axios from "axios";
@@ -13,15 +16,39 @@ const FormRegister = () => {
     e.preventDefault();
 
     try {
-      const response = await axios.post('http://localhost:3000/api/auth/register', {
+      // const response = await axios.post('http://localhost:3000/api/auth/register', {
+      //   username,
+      //   email,
+      //   password,
+      //   confirmPassword
+      // });
+
+      const response = await createUserWithEmailAndPassword(auth, email, password);
+      console.log({
+        user_firebase: response.user,
         username,
-        email,
-        password,
-        confirmPassword
+        email
       });
 
-      console.log(response.data);
+      const idToken = await response.user.getIdToken();
+
+      const responseBackend = await axios.post(
+        'http://localhost:3000/api/auth/register',
+        { username },
+        {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        }
+      );
+
+      console.log({
+        user_backend: responseBackend.data
+      });
+
       navigate('/login');
+
+      // navigate('/login');
       
     } catch (error) {
       console.error(error);
