@@ -2,6 +2,8 @@ import { Link, useNavigate } from "react-router-dom";
 
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL; 
+
 import { auth } from "../../firebase.js";
 import { signInWithEmailAndPassword, signInWithPopup, getAdditionalUserInfo } from "firebase/auth";
 import { googleProvider } from "../../firebase.js";
@@ -44,7 +46,7 @@ const FormLogIn = () => {
       
       if (additionalUserInfo.isNewUser) {
         const responseBackend = await axios.post(
-          'http://localhost:3000/api/auth/register',
+          `${API_URL}/auth/register`,
           { username },
           {
             headers: {

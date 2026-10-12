@@ -5,6 +5,8 @@ import { Link, useNavigate } from "react-router-dom"
 
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL; 
+
 import { useState } from "react";
 
 const FormRegister = () => {
@@ -33,7 +35,7 @@ const FormRegister = () => {
       const idToken = await response.user.getIdToken();
 
       const responseBackend = await axios.post(
-        'http://localhost:3000/api/auth/register',
+        `${API_URL}/auth/register`,
         { username },
         {
           headers: {
