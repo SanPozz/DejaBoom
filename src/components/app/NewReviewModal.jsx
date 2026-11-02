@@ -103,7 +103,7 @@ const NewReviewModal = ({ isOpen, onClose }) => {
 
             {/* Resultados de búsqueda */}
             {search.trim() && !selectedGame && (
-              <div className="list-games-scrollbar mt-2 max-h-56 overflow-y-auto rounded-lg border border-primary/20 bg-background-secondary">
+              <div className="dropdown-reveal list-games-scrollbar mt-2 max-h-56 overflow-y-auto rounded-lg border border-primary/20 bg-background-secondary">
                 {filteredGames.length > 0 ? (
                   filteredGames.map((game) => (
                     <button
