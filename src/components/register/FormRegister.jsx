@@ -1,6 +1,3 @@
-import { auth } from "../../firebase.js";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-
 import { Link, useNavigate } from "react-router-dom"
 
 import axios from "axios";
@@ -9,7 +6,10 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 import { useState } from "react";
 
+import { useAuth } from "../../context/AuthContext.jsx";
+
 const FormRegister = () => {
+  const { register } = useAuth();
 
   const navigate = useNavigate();
 
@@ -18,14 +18,8 @@ const FormRegister = () => {
     e.preventDefault();
 
     try {
-      // const response = await axios.post('http://localhost:3000/api/auth/register', {
-      //   username,
-      //   email,
-      //   password,
-      //   confirmPassword
-      // });
 
-      const response = await createUserWithEmailAndPassword(auth, email, password);
+      const response = await register(email, password);
       console.log({
         user_firebase: response.user,
         username,
@@ -50,7 +44,6 @@ const FormRegister = () => {
 
       navigate('/login');
 
-      // navigate('/login');
       
     } catch (error) {
       console.error(error);

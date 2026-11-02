@@ -1,12 +1,11 @@
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext.jsx";
 
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL; 
 
-import { auth } from "../../firebase.js";
-import { signInWithEmailAndPassword, signInWithPopup, getAdditionalUserInfo } from "firebase/auth";
-import { googleProvider } from "../../firebase.js";
+import { getAdditionalUserInfo } from "firebase/auth";
 
 import { useState } from "react";
 import GoogleSignInButton from "./GoogleSignInButton";
@@ -15,6 +14,7 @@ import GoogleSignInButton from "./GoogleSignInButton";
 const FormLogIn = () => {
 
   const navigate = useNavigate();
+  const { login, loginWithGoogle } = useAuth();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -22,11 +22,9 @@ const FormLogIn = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await signInWithEmailAndPassword(auth, email, password);
+      await login(email, password);
 
-      if (response.user) {
-        navigate('/home');
-      }
+      navigate('/home');
 
     } catch (error) {
       console.error(error);
@@ -36,9 +34,11 @@ const FormLogIn = () => {
   const handleGoogleSignIn = async () => {
     try {
 
-      const response = await signInWithPopup(auth, googleProvider);
+      const response = await loginWithGoogle();
 
       const additionalUserInfo = getAdditionalUserInfo(response);
+
+      console.log(additionalUserInfo);
 
       const idToken = await response.user.getIdToken();
       const username = response.user.displayName;
@@ -60,7 +60,7 @@ const FormLogIn = () => {
           throw new Error('Failed to register new user in the backend');
         }
         
-        navigate('/home');
+        navigate('/home?error=failed%20to%20connect%20user%20to%20backend');
       }
       
 

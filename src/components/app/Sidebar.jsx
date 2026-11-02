@@ -1,4 +1,6 @@
 import logo from '../../assets/dejaboompng.png';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { useNavigate } from 'react-router-dom';
 import { LogOut, Home, Compass, List, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -12,6 +14,8 @@ const linksSidebar = [
 ];
 
 const Sidebar = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   const location = useLocation(); // Nos permite detectar la página actual para pintar el enlace activo
   const [isNewReviewModalOpen, setIsNewReviewModalOpen] = useState(false);
 
@@ -112,8 +116,8 @@ const Sidebar = () => {
 
           {/* Botón Cerrar Sesión */}
           <div className='w-full px-2'>
-            <Link
-              to='/logout'
+            <button
+              onClick={() => logout().then(() => navigate('/login'))}
               className='text-[color:var(--color-tertiary)] hover:text-rose-400 flex gap-3 items-center text-sm font-semibold transition-colors duration-200 group'
             >
               <LogOut
@@ -121,7 +125,7 @@ const Sidebar = () => {
                 className='text-[color:var(--color-tertiary)] group-hover:text-rose-400 transition-colors'
               />
               Cerrar Sesión
-            </Link>
+            </button>
           </div>
         </nav>
       </aside>

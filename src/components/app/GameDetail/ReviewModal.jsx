@@ -1,34 +1,65 @@
 import { X } from "lucide-react"
 import { useState } from "react"
+import { auth } from "../../../firebase"
 import RatingStars from "./RatingStars"
+import axios from "axios"
 
-const ReviewModal = ({ isOpen, onClose, gameName = "Juego" }) => {
+const ReviewModal = ({ isOpen, onClose, gameName = "Juego", gameId = 1 }) => {
   const [rating, setRating] = useState(0)
-  const [comment, setComment] = useState("")
+  const [content, setContent] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    if (rating === 0 || !comment.trim()) {
+    if (rating === 0 || !content.trim()) {
       alert("Por favor completa la calificación y comentario")
       return
     }
 
     setIsSubmitting(true)
-    // Simular envío
-    setTimeout(() => {
-      console.log({ gameName, rating, comment })
-      alert("Reseña enviada exitosamente")
-      setRating(0)
-      setComment("")
+
+    try {
+
+      const user = auth.currentUser
+      if (!user) {
+        alert("Debes iniciar sesión para enviar una reseña")
+        setIsSubmitting(false)
+        return
+      }
+
+      const token = await user.getIdToken()
+
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/reviews/create`, {
+        gameName,
+        rating,
+        content,
+        gameId
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      
+      if (response.status === 200 || response.status === 201) {
+        alert("Reseña enviada exitosamente")
+        console.log(response.data)
+        setRating(0)
+        setContent("")
+        setIsSubmitting(false)
+        onClose()
+      }
+
+    } catch (error) {
+      console.error(error)
+      alert("Error al enviar la reseña")
       setIsSubmitting(false)
-      onClose()
-    }, 500)
+    }
+    
   }
 
   const handleClose = () => {
     setRating(0)
-    setComment("")
+    setContent("")
     onClose()
   }
 
@@ -51,6 +82,9 @@ const ReviewModal = ({ isOpen, onClose, gameName = "Juego" }) => {
 
         {/* Contenido */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
+
+          <input hidden type="text" name="gameId" id="gameId" value={gameId} />
+
           {/* Rating */}
           <div>
             <label className="block text-sm font-semibold text-secondary mb-3">
@@ -65,15 +99,15 @@ const ReviewModal = ({ isOpen, onClose, gameName = "Juego" }) => {
               Tu comentario
             </label>
             <textarea
-              value={comment}
-              onChange={(e) => setComment(e.target.value)}
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
               placeholder="Comparte tu experiencia con este juego..."
               rows={4}
               maxLength={500}
               className="w-full bg-background border border-primary/25 rounded-lg px-3 py-2 text-secondary placeholder-tertiary/50 focus:border-primary focus:ring-1 focus:ring-primary/30 focus:outline-none resize-none transition-colors"
             />
             <div className="mt-1 text-xs text-tertiary text-right">
-              {comment.length}/500
+              {content.length}/500
             </div>
           </div>
 

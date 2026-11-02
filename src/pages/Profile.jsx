@@ -1,5 +1,7 @@
 import { MessageSquare, Bookmark, LogOut } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
+import { useNavigate } from 'react-router-dom';
+
 import Sidebar from '../components/app/Sidebar';
 import ProfileHeader from '../components/app/Profile/ProfileHeader';
 import ProfileStats from '../components/app/Profile/ProfileStats';
@@ -10,6 +12,8 @@ import UserLists from '../components/app/Profile/UserLists';
 import { getProfile } from '../utils/profileStorage';
 
 const Profile = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   const userProfile = getProfile();
 
   const stats = [
@@ -82,13 +86,14 @@ const Profile = () => {
             className='w-full h-full object-cover'
           />
           <div className='absolute inset-0 bg-linear-to-t from-background/90 to-transparent' />
-          <Link
-            to='/logout'
+          <button
+            type='button'
+            onClick={() => logout().then(() => navigate('/login'))}
             className='absolute right-4 top-4 z-10 flex items-center gap-2 rounded-xl border border-white/20 bg-background/75 px-3 py-2 text-sm font-semibold text-secondary backdrop-blur-sm transition-colors hover:border-rose-400/50 hover:bg-rose-400/15 hover:text-rose-300 sm:right-6 sm:top-6 sm:px-4 sm:py-2.5 lg:hidden'
           >
             <LogOut size={18} />
             <span>Cerrar sesión</span>
-          </Link>
+          </button>
         </div>
 
         {/* Main Content */}
