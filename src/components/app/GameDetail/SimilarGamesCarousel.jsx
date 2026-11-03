@@ -65,9 +65,9 @@ const SimilarGamesCarousel = () => {
       </div>
 
       {/* Mobile: scroll horizontal con snap */}
-      <div className="-mx-4 flex snap-x snap-mandatory scroll-pl-4 gap-3 overflow-x-auto px-4 pb-2 [scrollbar-width:none] sm:hidden [&::-webkit-scrollbar]:hidden">
+      <div className="-mx-4 flex snap-x snap-mandatory scroll-pl-4 sm:scroll-pl-6 gap-3 overflow-x-auto px-4 pb-2 sm:px-6 sm:-mx-6 lg:hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {similarGames.map((game) => (
-          <div key={game.id} className="group w-[38%] min-w-[130px] shrink-0 snap-start cursor-pointer">
+          <div key={game.id} className="group w-[38%] min-w-[130px] shrink-0 snap-start cursor-pointer sm:w-[28%] sm:min-w-[170px]">
             <div className="mb-2 aspect-[3/4] overflow-hidden rounded-lg border border-tertiary/15 bg-background-secondary">
               <img src={game.image} alt={game.title} className="h-full w-full object-cover" />
             </div>
@@ -77,10 +77,10 @@ const SimilarGamesCarousel = () => {
         ))}
       </div>
 
-      {/* Carousel Container (sm+) */}
-      <div className="relative hidden sm:block">
+      {/* Carousel Container (lg+) */}
+      <div className="relative hidden lg:block">
         {/* Games Grid */}
-        <div className="grid grid-cols-2 gap-6 lg:grid-cols-3">
+        <div className="grid grid-cols-3 gap-6">
           {visibleGames.map((game) => (
             <div
               key={game.id}
