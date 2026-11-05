@@ -51,12 +51,6 @@ export default function FavoriteGames() {
     closePicker()
   }
 
-  const removeFavorite = (gameId) => {
-    const updatedIds = favoriteIds.filter((id) => id !== gameId)
-    localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(updatedIds))
-    setFavoriteIds(updatedIds)
-  }
-
   return (
     <section className="mb-12" aria-labelledby="favorite-games-title">
       <div className="mb-4 flex items-center justify-between border-b border-tertiary/10 pb-2">
@@ -91,28 +85,14 @@ export default function FavoriteGames() {
               <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/90 to-transparent px-2 pb-2 pt-8">
                 <p className="truncate text-xs font-semibold text-white" title={game.title}>{game.title}</p>
               </div>
-              <button
-                type="button"
-                onClick={() => removeFavorite(game.id)}
-                aria-label={`Quitar ${game.title} de favoritos`}
-                className="absolute right-2 top-2 grid h-8 w-8 place-items-center rounded-full bg-black/75 text-white transition hover:bg-rose-600"
-              >
-                <X size={16} />
-              </button>
             </div>
           ) : (
-            <button
+            <div
               key={`empty-${index}`}
-              type="button"
-              onClick={openPicker}
-              aria-label={`Agregar juego favorito ${index + 1}`}
-              className="grid aspect-[3/4] min-w-0 place-items-center rounded-lg border border-dashed border-primary/25 bg-background-secondary/50 text-tertiary transition hover:border-primary hover:text-primary"
+              className="grid aspect-[3/4] min-w-0 place-items-center rounded-lg border border-dashed border-primary/25 bg-background-secondary/50 text-tertiary"
             >
-              <span className="flex flex-col items-center gap-2">
-                <Plus size={20} />
-                <span className="text-[11px]">Agregar</span>
-              </span>
-            </button>
+              <span className="text-[11px]">No seleccionado</span>
+            </div>
           )
         })}
       </div>

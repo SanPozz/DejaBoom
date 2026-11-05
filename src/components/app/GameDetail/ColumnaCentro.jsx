@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 const game = {
     title: "Dark Souls III",
@@ -40,10 +40,13 @@ const game = {
     ]
 }
 
-export default function ColumnaCentro() {
+const labelClass = "text-[color:var(--color-tertiary)] uppercase tracking-wider text-[10px]"
+const chipClass = "text-primary bg-primary/15 border border-primary/20 px-2.5 py-1 rounded-sm hover:bg-primary/25 cursor-pointer transition-colors"
+
+export default function ColumnaCentro({ genres = [], platforms = [], studios = [], publishers = [], title, releaseDate, description }) {
     const tabs = [
         { id: 'details', label: 'Detalles' },
-        { id: 'genres', label: 'Generos' },
+        { id: 'genres', label: 'Géneros' },
         { id: 'platforms', label: 'Plataformas' }
     ];
 
@@ -57,39 +60,76 @@ export default function ColumnaCentro() {
     const tabsContainerRef = useRef(null);
     const tabRefs = useRef([]);
 
-    // Cada vez que cambia la pestaña, medimos su tamaño y posición real en píxeles
+    // Mide la pestaña activa al cambiar de pestaña y cada vez que el contenedor cambia de tamaño
     useEffect(() => {
-        const activeTabEl = tabRefs.current[activeTabIdx];
         const containerEl = tabsContainerRef.current;
+        if (!containerEl) return;
 
-        if (activeTabEl && containerEl) {
+        const measure = () => {
+            const activeTabEl = tabRefs.current[activeTabIdx];
+            if (!activeTabEl) return;
             const activeRect = activeTabEl.getBoundingClientRect();
             const containerRect = containerEl.getBoundingClientRect();
+            setLineStyle({ width: activeRect.width, left: activeRect.left - containerRect.left });
+        };
 
-            // Calculamos la posición horizontal relativa al contenedor padre de las pestañas
-            const leftOffset = activeRect.left - containerRect.left;
-
-            setLineStyle({
-                width: activeRect.width,
-                left: leftOffset
-            });
-        }
+        measure();
+        const observer = new ResizeObserver(measure);
+        observer.observe(containerEl);
+        return () => observer.disconnect();
     }, [activeTabIdx]);
+
+    // Se guarda para qué descripción está expandido, así al cambiar de juego vuelve a resumirse solo
+    const [expandedFor, setExpandedFor] = useState(null);
+    const isExpanded = expandedFor === description;
+    const [isTruncated, setIsTruncated] = useState(false);
+    const descriptionRef = useRef(null);
+
+    // Con line-clamp el texto cortado tiene más alto de contenido que de caja visible
+    useEffect(() => {
+        const el = descriptionRef.current;
+        if (!el || isExpanded) return;
+
+        const check = () => setIsTruncated(el.scrollHeight > el.clientHeight + 1);
+        check();
+        const observer = new ResizeObserver(check);
+        observer.observe(el);
+        return () => observer.disconnect();
+    }, [description, isExpanded]);
 
     return (
         <section className="space-y-8 flex-1 min-w-0">
             {/* Encabezado e Info General */}
             <div>
                 <div className="flex items-baseline gap-3 flex-wrap">
-                    <h1 className="text-4xl font-mono font-black tracking-tight text-white">{game.title}</h1>
-                    <span className="text-xl text-[color:var(--color-tertiary)] font-light">{game.details.releaseDate}</span>
-                    <span className="text-xs text-[color:var(--color-tertiary)]">Dirigido por  <span className="text-white hover:underline cursor-pointer font-medium">{game.details.director}</span></span>
+                    <h1 className="text-4xl font-mono font-black tracking-tight text-white">{title}</h1>
+                    <span className="text-xl text-[color:var(--color-tertiary)] font-light">{releaseDate}</span>
+                    {studios.length > 0 && (
+                        <span className="text-xs text-[color:var(--color-tertiary)]">Por <span className="text-white font-medium">{studios.join(", ")}</span></span>
+                    )}
                 </div>
 
                 {/* Sinopsis */}
-                <p className="mt-4 text-sm text-zinc-300 leading-relaxed font-light">
-                    {game.description} <span className="text-[color:var(--color-tertiary)] hover:text-white cursor-pointer font-sm">Ver Más...</span>
-                </p>
+                {description && (
+                    <div className="mt-4">
+                        <p
+                            ref={descriptionRef}
+                            className={`text-sm text-zinc-300 leading-relaxed font-light ${isExpanded ? "" : "line-clamp-3"}`}
+                        >
+                            {description}
+                        </p>
+                        {(isTruncated || isExpanded) && (
+                            <button
+                                type="button"
+                                onClick={() => setExpandedFor(isExpanded ? null : description)}
+                                aria-expanded={isExpanded}
+                                className="mt-1 text-xs font-semibold text-primary hover:underline cursor-pointer"
+                            >
+                                {isExpanded ? "Ver menos" : "Ver más"}
+                            </button>
+                        )}
+                    </div>
+                )}
             </div>
 
             {/* Contenedor de Pestañas con Medición Dinámica */}
@@ -108,52 +148,59 @@ export default function ColumnaCentro() {
                     />
 
                     {tabs.map((tab, idx) => (
-                        <span
+                        <button
                             key={tab.id}
+                            type="button"
+                            role="tab"
+                            aria-selected={activeTabIdx === idx}
                             ref={(el) => (tabRefs.current[idx] = el)} // Guarda la referencia de cada pestaña individual
-                            className={`pb-2 cursor-pointer z-10 transition-colors duration-200 ${activeTabIdx === idx ? 'text-white' : 'hover:text-zinc-300'}`}
+                            className={`pb-2 cursor-pointer z-10 uppercase tracking-wider transition-colors duration-200 ${activeTabIdx === idx ? 'text-white' : 'hover:text-zinc-300'}`}
                             onClick={() => setActiveTabIdx(idx)}
                         >
                             {tab.label}
-                        </span>
+                        </button>
                     ))}
                 </div>
 
                 {/* Renderizado de Paneles */}
-                <div className="min-h-[100px]">
+                <div className="min-h-[100px]" role="tabpanel">
                     {selectedTab === 'details' && (
-                        <div className="text-xs grid grid-cols-[80px_1fr] gap-2 py-1">
-                            <span className="text-[color:var(--color-tertiary)] uppercase tracking-wider text-[10px]">Director</span>
-                            <span className="text-primary bg-primary/30 px-2 py-0.5 rounded self-start hover:bg-primary/15 cursor-pointer transition-colors transition-400">{game.details.director}</span>
-                            <span className="text-[color:var(--color-tertiary)] uppercase tracking-wider text-[10px]">Estudio</span>
-                            <span className="text-primary bg-primary/30 px-2 py-0.5 rounded self-start hover:bg-primary/15 cursor-pointer transition-colors transition-400">{game.details.studio}</span>
-                            <span className="text-[color:var(--color-tertiary)] uppercase tracking-wider text-[10px]">Fecha de lanzamiento</span>
-                            <span className="text-primary bg-primary/30 px-2 py-0.5 rounded self-start hover:bg-primary/15 cursor-pointer transition-colors transition-400">{game.details.releaseDate}</span>
+                        <div className="text-xs grid grid-cols-[110px_1fr] items-center gap-x-3 gap-y-3 py-1">
+                            <span className={`${labelClass} pt-1`}>Estudio</span>
+                            <div className="flex flex-wrap gap-2">
+                                {studios.length > 0 ? studios.map((studio) => (
+                                    <span key={studio} className={chipClass}>{studio}</span>
+                                )) : <span className="text-tertiary">Sin datos</span>}
+                            </div>
+                            <span className={`${labelClass} pt-1`}>Distribuidora</span>
+                            <div className="flex flex-wrap gap-2">
+                                {publishers.length > 0 ? publishers.map((publisher) => (
+                                    <span key={publisher} className={chipClass}>{publisher}</span>
+                                )) : <span className="text-tertiary">Sin datos</span>}
+                            </div>
+                            <span className={labelClass}>Lanzamiento</span>
+                            <div className="flex"><span className={chipClass}>{releaseDate || "Sin datos"}</span></div>
                         </div>
                     )}
                     
                     {selectedTab === 'genres' && (
-                        <div className="text-xs grid grid-cols-[80px_1fr] gap-2 py-1">
-                            <span className="text-[color:var(--color-tertiary)] uppercase tracking-wider text-[10px] pt-0.5">Géneros</span>
-                            <div className="flex flex-col gap-1.5 items-start">
-                                {game.details.genres.map((genre, index) => (
-                                    <span key={index} className="text-primary bg-primary/30 px-2 py-0.5 rounded hover:bg-primary/15 cursor-pointer transition-colors transition-400 text-xs">
-                                        {genre}
-                                    </span>
-                                ))}
+                        <div className="text-xs grid grid-cols-[110px_1fr] gap-x-3 py-1">
+                            <span className={`${labelClass} pt-1`}>Géneros</span>
+                            <div className="flex flex-wrap gap-2">
+                                {genres.length > 0 ? genres.map((genre) => (
+                                    <span key={genre} className={chipClass}>{genre}</span>
+                                )) : <span className="text-tertiary">Sin datos</span>}
                             </div>
                         </div>
                     )}
 
                     {selectedTab === 'platforms' && (
-                        <div className="text-xs grid grid-cols-[80px_1fr] gap-2 py-1">
-                            <span className="text-[color:var(--color-tertiary)] uppercase tracking-wider text-[10px] pt-0.5">Platformas</span>
-                            <div className="flex flex-col gap-1.5 items-start">
-                                {game.details.platforms.map((platform, index) => (
-                                    <span key={index} className="text-primary bg-primary/30 px-2 py-0.5 rounded hover:bg-primary/15 cursor-pointer transition-colors transition-400 text-xs">
-                                        {platform}
-                                    </span>
-                                ))}
+                        <div className="text-xs grid grid-cols-[110px_1fr] gap-x-3 py-1">
+                            <span className={`${labelClass} pt-1`}>Plataformas</span>
+                            <div className="flex flex-wrap gap-2">
+                                {platforms.length > 0 ? platforms.map((platform) => (
+                                    <span key={platform} className={chipClass}>{platform}</span>
+                                )) : <span className="text-tertiary">Sin datos</span>}
                             </div>
                         </div>
                     )}

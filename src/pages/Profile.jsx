@@ -1,5 +1,8 @@
+
 import { MessageSquare, Bookmark, LogOut } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext.jsx';
+import { useNavigate } from 'react-router-dom';
+
 import Sidebar from '../components/app/Sidebar';
 import ProfileHeader from '../components/app/Profile/ProfileHeader';
 import ProfileStats from '../components/app/Profile/ProfileStats';
@@ -9,7 +12,12 @@ import ActivitySidebar from '../components/app/Profile/ActivitySidebar';
 import UserLists from '../components/app/Profile/UserLists';
 import { getProfile } from '../utils/profileStorage';
 
+import { userReviews } from "../data/reviews"
+
+
 const Profile = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   const userProfile = getProfile();
 
   const stats = [
@@ -24,29 +32,8 @@ const Profile = () => {
     // { icon: Trophy, label: "Logros", value: 24, color: "text-amber-400" },
   ];
 
-  const recentReviews = [
-    {
-      id: 1,
-      gameTitle: 'Elden Ring',
-      rating: 5,
-      date: 'Hace 2 días',
-      text: 'Una obra maestra absoluta. La libertad de exploración combinada con un combate desafiante es simplemente adictivo.',
-    },
-    {
-      id: 2,
-      gameTitle: "Baldur's Gate 3",
-      rating: 4.5,
-      date: 'Hace 1 semana',
-      text: 'Increíble profundidad en las decisiones y personajes. Los diálogos son excelentes aunque el juego es bastante largo.',
-    },
-    {
-      id: 3,
-      gameTitle: 'Starfield',
-      rating: 3.5,
-      date: 'Hace 2 semanas',
-      text: 'Buen juego, pero esperaba más. La exploración espacial está bien pero necesita más variedad en los planetas.',
-    },
-  ];
+
+  const recentReviews = userReviews.slice(0, 3);
 
   const userLists = [
     {
@@ -82,13 +69,14 @@ const Profile = () => {
             className='w-full h-full object-cover'
           />
           <div className='absolute inset-0 bg-linear-to-t from-background/90 to-transparent' />
-          <Link
-            to='/logout'
+          <button
+            type='button'
+            onClick={() => logout().then(() => navigate('/login'))}
             className='absolute right-4 top-4 z-10 flex items-center gap-2 rounded-xl border border-white/20 bg-background/75 px-3 py-2 text-sm font-semibold text-secondary backdrop-blur-sm transition-colors hover:border-rose-400/50 hover:bg-rose-400/15 hover:text-rose-300 sm:right-6 sm:top-6 sm:px-4 sm:py-2.5 lg:hidden'
           >
             <LogOut size={18} />
             <span>Cerrar sesión</span>
-          </Link>
+          </button>
         </div>
 
         {/* Main Content */}

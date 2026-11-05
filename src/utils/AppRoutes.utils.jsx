@@ -1,4 +1,6 @@
 import { Routes, Route } from "react-router-dom"
+import ProtectedRoute from "../components/ProtectedRoute"
+import PublicOnlyRoute from "../components/PublicOnlyRoute"
 
 import LandingPage from "../pages/LandingPage"
 
@@ -13,6 +15,7 @@ import Lists from "../pages/Lists"
 import ListDetail from "../pages/ListDetail"
 import ListForm from "../pages/ListForm"
 import NotFound from "../pages/NotFound"
+import AllReviews from "../pages/AllReviews"
 
 
 const AppRoutes = () => {
@@ -20,17 +23,22 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={<LandingPage />} />
 
-      <Route path="/login" element={<LogIn />} />
-      <Route path="/register" element={<Register />} />
+      <Route element={<PublicOnlyRoute />}>
+        <Route path="/login" element={<LogIn />} />
+        <Route path="/register" element={<Register />} />
+      </Route>
 
-      <Route path="/home" element={<Home />} />
-      <Route path="/game/:id" element={<GameDetail />} />
-      <Route path="/profile" element={<Profile />} />
-      <Route path="/profile/edit" element={<EditProfile />} />
-      <Route path="/lists" element={<Lists />} />
-      <Route path="/lists/new" element={<ListForm />} />
-      <Route path="/lists/:id/edit" element={<ListForm />} />
-      <Route path="/lists/:id" element={<ListDetail />} />
+      <Route element={<ProtectedRoute allowedRoles={['USER']} />}>
+        <Route path="/home" element={<Home />} />
+        <Route path="/game/:id" element={<GameDetail />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/edit" element={<EditProfile />} />
+        <Route path="/lists" element={<Lists />} />
+        <Route path="/lists/new" element={<ListForm />} />
+        <Route path="/lists/:id/edit" element={<ListForm />} />
+        <Route path="/lists/:id" element={<ListDetail />} />
+        <Route path="/profile/reviews" element={<AllReviews />} />
+      </Route>
 
       <Route path="*" element={<NotFound />} />
     </Routes>

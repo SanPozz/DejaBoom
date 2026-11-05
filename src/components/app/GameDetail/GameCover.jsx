@@ -16,7 +16,7 @@ const game = {
 }
 
 
-const GameCover = () => {
+const GameCover = ({ url, title }) => {
 
   return (
 <div className="sticky top-6 self-start w-[230px] shrink-0 z-10">
@@ -27,8 +27,8 @@ const GameCover = () => {
         {/* Imagen de portada */}
         <div className="h-[345px] w-[230px] overflow-hidden rounded-t-xl">
           <img 
-            src={game.img} 
-            alt={game.title} 
+            src={url} 
+            alt={title} 
             className="w-full h-full object-cover"
           />
         </div>
