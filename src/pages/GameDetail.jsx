@@ -10,8 +10,31 @@ import SimilarGamesCarousel from "../components/app/GameDetail/SimilarGamesCarou
 
 import PopularListsSection from "../components/app/GameDetail/PopularListsSection"
 import CommentSection from "../components/app/GameDetail/CommentSection"
+import { useEffect, useState } from "react"
+import axios from "axios"
+import { useParams } from "react-router-dom"
+import { getCoverUrl } from "../services/games.service"
+
+
+const getCompanies = (game, role) =>
+  game?.involved_companies?.filter((item) => item[role]).map((item) => item.company.name) ?? []
 
 const GameDetail = () => {
+
+  const { id: gameId } = useParams()
+  const [game, setGame] = useState(null)
+
+  useEffect(() => {
+    axios.get(`${import.meta.env.VITE_API_URL}/games/${gameId}`)
+      .then((response) => {
+        console.log(response.data)
+        setGame(response.data)
+      })
+      .catch((error) => {
+        console.error("Error fetching game details:", error)
+      })
+  }, [gameId])
+
   return (
     <div className="flex w-full bg-background min-h-screen text-secondary font-sans antialiased">
 
@@ -21,11 +44,21 @@ const GameDetail = () => {
 
             <main className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 xl:grid-cols-[220px_1fr_260px] gap-8 items-start">
 
-                <GameCover />
+                <GameCover url={getCoverUrl(game?.cover?.url, "t_cover_big_2x")} title={game?.name} />
 
-                <ColumnaCentro/>
+                <ColumnaCentro 
+                   genres={game?.genres?.map((genre) => genre.name) ?? []}
+                   platforms={game?.platforms?.map((platform) => platform.name) ?? []}
+                    title={game?.name}
+                   releaseDate={game?.first_release_date
+                     ? new Date(game.first_release_date * 1000).toLocaleDateString("es-AR", { timeZone: "UTC" })
+                     : ""}
+                   description={game?.summaryEs}
+                   studios={getCompanies(game, "developer")}
+                   publishers={getCompanies(game, "publisher")}
+                />
 
-                <DerechaGameDetail gameName="Ember Souls" />
+                <DerechaGameDetail gameName={game?.name} />
 
             </main>
 
@@ -33,7 +66,7 @@ const GameDetail = () => {
 
             <SimilarGamesCarousel />
 
-            <PopularListsSection gameName="Ember Souls" />
+            <PopularListsSection gameName={game?.name} />
 
         </div>
 

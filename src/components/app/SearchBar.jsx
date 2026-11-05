@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
+import axios from "axios"
 import { Search, UserIcon } from "lucide-react"
 import { Link } from "react-router-dom"
-import { searchGames } from "../../data/games"
+import { searchGames } from "../../services/games.service"
 import { useDebounce } from "../../utils/useDebounce"
 
 const SearchBar = () => {
@@ -10,11 +11,29 @@ const SearchBar = () => {
   const wrapperRef = useRef(null)
 
   const debouncedQuery = useDebounce(query, 300)
-  const isSearching = query.trim() !== debouncedQuery.trim()
-  const results = useMemo(() => searchGames(debouncedQuery), [debouncedQuery])
+  const term = debouncedQuery.trim()
+
+  const [response, setResponse] = useState({ term: "", games: [] })
+  const results = response.games
+  const isSearching = query.trim() !== term || response.term !== term
   const showDropdown = open && query.trim() !== ""
 
-  // Cerrar al hacer clic afuera
+  
+  useEffect(() => {
+    if (!term) return
+
+    const controller = new AbortController()
+    searchGames(term, controller.signal)
+      .then((games) => setResponse({ term, games }))
+      .catch((error) => {
+        if (!axios.isCancel(error)) setResponse({ term, games: [] })
+      })
+
+    
+    return () => controller.abort()
+  }, [term])
+
+  
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target)) setOpen(false)
@@ -43,6 +62,7 @@ const SearchBar = () => {
           onFocus={() => setOpen(true)}
           onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
           placeholder="Buscar juegos, géneros, plataformas..."
+          maxLength={100}
           className="w-full pl-10 pr-3 py-3 bg-background-secondary border border-tertiary rounded-2xl text-white placeholder-tertiary/50 focus:outline-none focus:border-primary transition-colors duration-300"
         />
 
@@ -65,7 +85,7 @@ const SearchBar = () => {
                     >
                       <p className="text-sm font-semibold text-secondary">{game.title}</p>
                       <p className="text-xs text-tertiary">
-                        {game.genres.join(" · ")} — {game.platforms.join(", ")}
+                        {[game.genres?.join(" · "), game.platforms?.join(", ")].filter(Boolean).join(" — ")}
                       </p>
                     </Link>
                   </li>
