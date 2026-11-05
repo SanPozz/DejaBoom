@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom"
+import ReviewDetail from "../pages/ReviewDetail"
 import ProtectedRoute from "../components/ProtectedRoute"
 import PublicOnlyRoute from "../components/PublicOnlyRoute"
 
@@ -38,6 +39,7 @@ const AppRoutes = () => {
         <Route path="/lists/:id/edit" element={<ListForm />} />
         <Route path="/lists/:id" element={<ListDetail />} />
         <Route path="/profile/reviews" element={<AllReviews />} />
+        <Route path="/review/:id" element={<ReviewDetail />} />
       </Route>
 
       <Route path="*" element={<NotFound />} />
