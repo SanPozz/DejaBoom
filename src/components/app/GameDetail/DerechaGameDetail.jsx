@@ -2,7 +2,7 @@ import { MessageSquare, Heart, Share2 } from "lucide-react"
 import { useState } from "react"
 import ReviewModal from "./ReviewModal"
 
-const DerechaGameDetail = ({ gameName = "Juego" }) => {
+const DerechaGameDetail = ({ gameName, gameId }) => {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
   const [isLiked, setIsLiked] = useState(false)
 
@@ -65,6 +65,7 @@ const DerechaGameDetail = ({ gameName = "Juego" }) => {
         isOpen={isReviewModalOpen}
         onClose={() => setIsReviewModalOpen(false)}
         gameName={gameName}
+        gameId={gameId}
       />
     </>
   )

@@ -11,6 +11,7 @@ const toGame = (game) => ({
     genres: game.genres?.map((genre) => genre.name) ?? [],
     platforms: game.platforms?.map((platform) => platform.name) ?? [],
     cover: getCoverUrl(game.cover?.url),
+    artwork: getCoverUrl(game.artworks?.[0]?.url, "t_1080p"),
     summary: game.summary ?? "",
     releaseDate: game.first_release_date ? new Date(game.first_release_date * 1000) : null,
 })
@@ -26,5 +27,15 @@ export const searchGames = async (query, signal) => {
         if (axios.isCancel(error)) throw error;
         console.error("Error searching games:", error);
         return [];
+    }
+}
+
+export const searchGameById = async (id) => {
+    try {
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/games/${id}`);
+        return toGame(response.data);
+    } catch (error) {
+        console.error("Error fetching game by ID:", error);
+        return null;
     }
 }

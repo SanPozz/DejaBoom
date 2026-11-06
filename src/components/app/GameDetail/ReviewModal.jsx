@@ -4,7 +4,7 @@ import { auth } from "../../../firebase"
 import RatingStars from "./RatingStars"
 import axios from "axios"
 
-const ReviewModal = ({ isOpen, onClose, gameName = "Juego", gameId = 1 }) => {
+const ReviewModal = ({ isOpen, onClose, gameName, gameId }) => {
   const [rating, setRating] = useState(0)
   const [content, setContent] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)

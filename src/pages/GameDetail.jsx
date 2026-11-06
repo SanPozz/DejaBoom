@@ -10,6 +10,7 @@ import SimilarGamesCarousel from "../components/app/GameDetail/SimilarGamesCarou
 
 import PopularListsSection from "../components/app/GameDetail/PopularListsSection"
 import CommentSection from "../components/app/GameDetail/CommentSection"
+import GameDetailSkeleton from "../components/app/GameDetail/GameDetailSkeleton"
 import { useEffect, useState } from "react"
 import axios from "axios"
 import { useParams } from "react-router-dom"
@@ -23,16 +24,26 @@ const GameDetail = () => {
 
   const { id: gameId } = useParams()
   const [game, setGame] = useState(null)
+  const [loadedId, setLoadedId] = useState(null)
+  const loading = loadedId !== gameId
 
   useEffect(() => {
+    let cancelled = false
+
     axios.get(`${import.meta.env.VITE_API_URL}/games/${gameId}`)
       .then((response) => {
-        console.log(response.data)
-        setGame(response.data)
+        if (!cancelled) setGame(response.data)
       })
       .catch((error) => {
         console.error("Error fetching game details:", error)
       })
+      .finally(() => {
+        if (!cancelled) setLoadedId(gameId)
+      })
+
+    return () => {
+      cancelled = true
+    }
   }, [gameId])
 
   return (
@@ -42,6 +53,7 @@ const GameDetail = () => {
 
         <div className="flex-1 w-full overflow-y-auto">
 
+            {loading ? <GameDetailSkeleton /> : (
             <main className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 xl:grid-cols-[220px_1fr_260px] gap-8 items-start">
 
                 <GameCover url={getCoverUrl(game?.cover?.url, "t_cover_big_2x")} title={game?.name} />
@@ -58,9 +70,10 @@ const GameDetail = () => {
                    publishers={getCompanies(game, "publisher")}
                 />
 
-                <DerechaGameDetail gameName={game?.name} />
+                <DerechaGameDetail gameName={game?.name} gameId={game?.id} />
 
             </main>
+            )}
 
             <CommentSection />
 

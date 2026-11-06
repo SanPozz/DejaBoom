@@ -3,7 +3,7 @@ import axios from "axios"
 import { Search, UserIcon } from "lucide-react"
 import { Link } from "react-router-dom"
 import { searchGames } from "../../services/games.service"
-import { useDebounce } from "../../utils/useDebounce"
+import { useDebounce } from "../../hooks/useDebounce"
 
 const SearchBar = () => {
   const [query, setQuery] = useState("")
