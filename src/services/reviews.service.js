@@ -26,6 +26,28 @@ export const getReviewById = async (id) => {
   }
 };
 
+export const createReview = async ({ gameId, rating, content, completed }) => {
+  try {
+    const user = auth.currentUser;
+
+    if (!user) {
+      throw new Error("User not authenticated");
+    }
+
+    const token = await user.getIdToken();
+
+    const response = await axios.post(`${API_URL}/reviews/create`, { gameId, rating, content, completed }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error creating review:", error);
+    throw error;
+  }
+};
+
 export const likeReview = async (reviewId) => {
   try {
     const user = auth.currentUser;

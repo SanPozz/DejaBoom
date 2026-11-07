@@ -1,27 +1,48 @@
-import { X, Search, Check } from "lucide-react"
-import { useMemo, useState } from "react"
+import { X, Search, Check, Gamepad2 } from "lucide-react"
+import { useEffect, useState } from "react"
+import axios from "axios"
 import RatingStars from "./GameDetail/RatingStars"
-import { gameCatalog } from "../../data/listEditorData"
+import Checkbox from "./Checkbox"
+import { searchGames } from "../../services/games.service"
+import { createReview } from "../../services/reviews.service"
+import { useDebounce } from "../../hooks/useDebounce"
+
+const MAX_RESULTS = 6
 
 const NewReviewModal = ({ isOpen, onClose }) => {
   const [selectedGame, setSelectedGame] = useState(null)
   const [search, setSearch] = useState("")
   const [rating, setRating] = useState(0)
   const [comment, setComment] = useState("")
+  const [completed, setCompleted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const filteredGames = useMemo(() => {
-    if (!search.trim()) return []
-    return gameCatalog
-      .filter((game) => game.title.toLowerCase().includes(search.toLowerCase()))
-      .slice(0, 6)
-  }, [search])
+  // Con un juego elegido no se busca: el input muestra su título
+  const debouncedSearch = useDebounce(search, 300)
+  const term = selectedGame ? "" : debouncedSearch.trim()
+
+  const [results, setResults] = useState({ term: "", games: [] })
+  const isSearching = search.trim() !== term || results.term !== term
+
+  useEffect(() => {
+    if (!term) return
+
+    const controller = new AbortController()
+    searchGames(term, controller.signal)
+      .then((games) => setResults({ term, games: games.slice(0, MAX_RESULTS) }))
+      .catch((error) => {
+        if (!axios.isCancel(error)) setResults({ term, games: [] })
+      })
+
+    return () => controller.abort()
+  }, [term])
 
   const resetForm = () => {
     setSelectedGame(null)
     setSearch("")
     setRating(0)
     setComment("")
+    setCompleted(false)
   }
 
   const handleClose = () => {
@@ -53,13 +74,15 @@ const NewReviewModal = ({ isOpen, onClose }) => {
     }
 
     setIsSubmitting(true)
-    // Simular envío
-    setTimeout(() => {
-      console.log({ game: selectedGame, rating, comment })
+    try {
+      await createReview({ gameId: selectedGame.id, rating, content: comment.trim(), completed })
       alert("Reseña enviada exitosamente")
-      setIsSubmitting(false)
       handleClose()
-    }, 500)
+    } catch {
+      alert("Error al enviar la reseña")
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   if (!isOpen) return null
@@ -93,6 +116,7 @@ const NewReviewModal = ({ isOpen, onClose }) => {
                 value={search}
                 onChange={(e) => handleChangeSearch(e.target.value)}
                 placeholder="Busca un juego..."
+                maxLength={100}
                 className="w-full bg-background border border-primary/25 rounded-lg pl-9 pr-9 py-2 text-secondary placeholder-tertiary/50 focus:border-primary focus:ring-1 focus:ring-primary/30 focus:outline-none transition-colors"
                 autoComplete="off"
               />
@@ -104,22 +128,32 @@ const NewReviewModal = ({ isOpen, onClose }) => {
             {/* Resultados de búsqueda */}
             {search.trim() && !selectedGame && (
               <div className="dropdown-reveal list-games-scrollbar mt-2 max-h-56 overflow-y-auto rounded-lg border border-primary/20 bg-background-secondary">
-                {filteredGames.length > 0 ? (
-                  filteredGames.map((game) => (
+                {isSearching ? (
+                  <p className="px-3 py-3 text-sm text-tertiary">Buscando...</p>
+                ) : results.games.length > 0 ? (
+                  results.games.map((game) => (
                     <button
                       key={game.id}
                       type="button"
                       onClick={() => handleSelectGame(game)}
                       className="cursor-pointer w-full flex items-center gap-3 border-b border-primary/10 px-3 py-2.5 text-left transition-colors last:border-b-0 hover:bg-primary/10"
                     >
-                      <img
-                        src={game.cover}
-                        alt={game.title}
-                        className="size-10 rounded-md object-cover shrink-0 border border-primary/10"
-                      />
+                      {game.cover ? (
+                        <img
+                          src={game.cover}
+                          alt={game.title}
+                          className="size-10 rounded-md object-cover shrink-0 border border-primary/10"
+                        />
+                      ) : (
+                        <div className="size-10 rounded-md shrink-0 border border-primary/10 bg-background flex items-center justify-center">
+                          <Gamepad2 size={18} className="text-tertiary" />
+                        </div>
+                      )}
                       <div className="min-w-0">
                         <p className="text-sm font-semibold text-secondary truncate">{game.title}</p>
-                        <p className="text-xs text-tertiary truncate">{game.platform}</p>
+                        <p className="text-xs text-tertiary truncate">
+                          {[game.releaseDate?.getUTCFullYear(), game.platforms.join(", ")].filter(Boolean).join(" · ")}
+                        </p>
                       </div>
                     </button>
                   ))
@@ -137,6 +171,14 @@ const NewReviewModal = ({ isOpen, onClose }) => {
             </label>
             <RatingStars rating={rating} onRatingChange={setRating} size="lg" />
           </div>
+
+          {/* Completado */}
+          <Checkbox
+            checked={completed}
+            onChange={setCompleted}
+            label="Lo completé"
+            description="Marcalo si terminaste el juego"
+          />
 
           {/* Comentario */}
           <div>

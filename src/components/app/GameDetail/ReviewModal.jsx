@@ -1,12 +1,13 @@
 import { X } from "lucide-react"
 import { useState } from "react"
-import { auth } from "../../../firebase"
 import RatingStars from "./RatingStars"
-import axios from "axios"
+import Checkbox from "../Checkbox"
+import { createReview } from "../../../services/reviews.service"
 
 const ReviewModal = ({ isOpen, onClose, gameName, gameId }) => {
   const [rating, setRating] = useState(0)
   const [content, setContent] = useState("")
+  const [completed, setCompleted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = async (e) => {
@@ -19,47 +20,24 @@ const ReviewModal = ({ isOpen, onClose, gameName, gameId }) => {
     setIsSubmitting(true)
 
     try {
-
-      const user = auth.currentUser
-      if (!user) {
-        alert("Debes iniciar sesión para enviar una reseña")
-        setIsSubmitting(false)
-        return
-      }
-
-      const token = await user.getIdToken()
-
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/reviews/create`, {
-        gameName,
-        rating,
-        content,
-        gameId
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      
-      if (response.status === 200 || response.status === 201) {
-        alert("Reseña enviada exitosamente")
-        console.log(response.data)
-        setRating(0)
-        setContent("")
-        setIsSubmitting(false)
-        onClose()
-      }
-
+      await createReview({ gameId, rating, content: content.trim(), completed })
+      alert("Reseña enviada exitosamente")
+      handleClose()
     } catch (error) {
-      console.error(error)
-      alert("Error al enviar la reseña")
+      alert(
+        error.message === "User not authenticated"
+          ? "Debes iniciar sesión para enviar una reseña"
+          : "Error al enviar la reseña"
+      )
+    } finally {
       setIsSubmitting(false)
     }
-    
   }
 
   const handleClose = () => {
     setRating(0)
     setContent("")
+    setCompleted(false)
     onClose()
   }
 
@@ -92,6 +70,14 @@ const ReviewModal = ({ isOpen, onClose, gameName, gameId }) => {
             </label>
             <RatingStars rating={rating} onRatingChange={setRating} size="lg" />
           </div>
+
+          {/* Completado */}
+          <Checkbox
+            checked={completed}
+            onChange={setCompleted}
+            label="Lo completé"
+            description="Marcalo si terminaste el juego"
+          />
 
           {/* Comentario */}
           <div>

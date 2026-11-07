@@ -10,7 +10,7 @@ const ratingDistribution = [
 
 //HARDCODED DATA 
 
-const GameRatingCard = () => (
+const GameRatingCard = ({ gameId }) => (
   <section className="bg-background-secondary border border-white/[0.07] rounded-2xl p-5 space-y-4">
     <h2 className="text-xs font-bold uppercase tracking-wider text-tertiary">Valoraciones del juego</h2>
     <div className="flex items-end gap-2">
@@ -28,7 +28,7 @@ const GameRatingCard = () => (
         </div>
       ))}
     </div>
-    <Link to="/home" className="block text-center text-xs font-bold text-black bg-primary hover:opacity-90 rounded-md py-2 transition-opacity">
+    <Link to={`/game/${gameId}`} className="block text-center text-xs font-bold text-black bg-primary hover:opacity-90 rounded-md py-2 transition-opacity">
       Ver el juego
     </Link>
   </section>

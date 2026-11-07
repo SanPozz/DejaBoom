@@ -100,7 +100,7 @@ const ReviewDetail = () => {
               </div>
 
               <aside className="space-y-6">
-                <GameRatingCard />
+                <GameRatingCard gameId={review.gameId} />
                 <MoreReviews reviews={otherReviews} />
               </aside>
             </main>
