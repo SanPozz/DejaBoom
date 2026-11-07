@@ -1,8 +1,9 @@
 import { MessageSquare, Heart, Share2 } from "lucide-react"
 import { useState } from "react"
 import ReviewModal from "./ReviewModal"
+import TimeToBeatCard from "./TimeToBeatCard"
 
-const DerechaGameDetail = ({ gameName, gameId }) => {
+const DerechaGameDetail = ({ gameName, gameId, timeToBeat }) => {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
   const [isLiked, setIsLiked] = useState(false)
 
@@ -59,6 +60,8 @@ const DerechaGameDetail = ({ gameName, gameId }) => {
             </div>
           </div>
         </div>
+
+        <TimeToBeatCard timeToBeat={timeToBeat} />
       </aside>
 
       <ReviewModal

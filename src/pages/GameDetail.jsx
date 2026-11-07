@@ -70,7 +70,7 @@ const GameDetail = () => {
                    publishers={getCompanies(game, "publisher")}
                 />
 
-                <DerechaGameDetail gameName={game?.name} gameId={game?.id} />
+                <DerechaGameDetail gameName={game?.name} gameId={game?.id} timeToBeat={game?.timeToBeat} />
 
             </main>
             )}
