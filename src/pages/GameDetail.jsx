@@ -9,16 +9,10 @@ import DerechaGameDetail from "../components/app/GameDetail/DerechaGameDetail"
 import SimilarGamesCarousel from "../components/app/GameDetail/SimilarGamesCarousel"
 
 import PopularListsSection from "../components/app/GameDetail/PopularListsSection"
-import CommentSection from "../components/app/GameDetail/CommentSection"
 import GameDetailSkeleton from "../components/app/GameDetail/GameDetailSkeleton"
 import { useEffect, useState } from "react"
-import axios from "axios"
 import { useParams } from "react-router-dom"
-import { getCoverUrl } from "../services/games.service"
-
-
-const getCompanies = (game, role) =>
-  game?.involved_companies?.filter((item) => item[role]).map((item) => item.company.name) ?? []
+import { searchGameById } from "../services/games.service"
 
 const GameDetail = () => {
 
@@ -30,16 +24,15 @@ const GameDetail = () => {
   useEffect(() => {
     let cancelled = false
 
-    axios.get(`${import.meta.env.VITE_API_URL}/games/${gameId}`)
-      .then((response) => {
-        if (!cancelled) setGame(response.data)
-      })
-      .catch((error) => {
-        console.error("Error fetching game details:", error)
-      })
-      .finally(() => {
-        if (!cancelled) setLoadedId(gameId)
-      })
+    window.scrollTo(0, 0)
+
+    searchGameById(gameId).then((result) => {
+      if (cancelled) return
+      setGame(result)
+      setLoadedId(gameId)
+    })
+
+
 
     return () => {
       cancelled = true
@@ -56,30 +49,26 @@ const GameDetail = () => {
             {loading ? <GameDetailSkeleton /> : (
             <main className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 xl:grid-cols-[220px_1fr_260px] gap-8 items-start">
 
-                <GameCover url={getCoverUrl(game?.cover?.url, "t_cover_big_2x")} title={game?.name} />
+                <GameCover url={game?.coverLarge} title={game?.title} />
 
-                <ColumnaCentro 
-                   genres={game?.genres?.map((genre) => genre.name) ?? []}
-                   platforms={game?.platforms?.map((platform) => platform.name) ?? []}
-                    title={game?.name}
-                   releaseDate={game?.first_release_date
-                     ? new Date(game.first_release_date * 1000).toLocaleDateString("es-AR", { timeZone: "UTC" })
-                     : ""}
-                   description={game?.summaryEs}
-                   studios={getCompanies(game, "developer")}
-                   publishers={getCompanies(game, "publisher")}
+                <ColumnaCentro
+                   genres={game?.genres ?? []}
+                   platforms={game?.platforms ?? []}
+                   title={game?.title}
+                   releaseDate={game?.releaseDate?.toLocaleDateString("es-AR", { timeZone: "UTC" }) ?? ""}
+                   description={game?.description}
+                   studios={game?.developers ?? []}
+                   publishers={game?.publishers ?? []}
                 />
 
-                <DerechaGameDetail gameName={game?.name} gameId={game?.id} timeToBeat={game?.timeToBeat} />
+                <DerechaGameDetail gameName={game?.title} gameId={game?.id} timeToBeat={game?.timeToBeat} />
 
             </main>
             )}
 
-            <CommentSection />
+            <SimilarGamesCarousel key={gameId} gameId={gameId} />
 
-            <SimilarGamesCarousel />
-
-            <PopularListsSection gameName={game?.name} />
+            <PopularListsSection gameName={game?.title} />
 
         </div>
 

@@ -41,7 +41,7 @@ const game = {
 }
 
 const labelClass = "text-[color:var(--color-tertiary)] uppercase tracking-wider text-[10px]"
-const chipClass = "text-primary bg-primary/15 border border-primary/20 px-2.5 py-1 rounded-sm hover:bg-primary/25 cursor-pointer transition-colors"
+const chipClass = "text-primary bg-primary/15 border border-primary/20 px-2.5 py-1 rounded-sm"
 
 export default function ColumnaCentro({ genres = [], platforms = [], studios = [], publishers = [], title, releaseDate, description }) {
     const tabs = [
@@ -211,14 +211,14 @@ export default function ColumnaCentro({ genres = [], platforms = [], studios = [
             <div className="space-y-4">
                 <div className="flex justify-between items-baseline border-b border-zinc-900 pb-2">
                     <h3 className="text-xs font-bold uppercase tracking-wider text-[color:var(--color-tertiary)]">Reviews Recientes</h3>
-                    <span className="text-[10px] uppercase text-zinc-500 hover:text-white cursor-pointer">Ver Más</span>
+                    <span className="text-[10px] uppercase text-zinc-500">Ver Más</span>
                 </div>
 
                 {game.reviews.map((review, index) => (
                     <div key={index} className="border-b border-zinc-900/60 pb-4 space-y-2">
                         <div className="flex items-center gap-2 text-xs">
                             <div className="w-5 h-5 rounded-full bg-cyan-500 flex items-center justify-center font-bold text-black text-[10px]">{review.user.charAt(0)}</div>
-                            <span className="text-zinc-400">Reseña por <span className="text-white font-bold hover:underline cursor-pointer">{review.user}</span></span>
+                            <span className="text-zinc-400">Reseña por <span className="text-white font-bold">{review.user}</span></span>
                             <span className="text-[color:var(--color-primary)]">
                                 {Array.from({ length: 5 }).map((_, s) => {
                                     const ratingValue = s + 1;

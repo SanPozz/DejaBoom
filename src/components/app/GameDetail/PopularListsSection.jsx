@@ -54,7 +54,7 @@ const PopularListsSection = ({ gameName = 'Ember Souls' }) => {
         {popularLists.map((list) => (
           <div
             key={list.id}
-            className='group bg-background-secondary border border-tertiary/15 rounded-xl overflow-hidden hover:border-tertiary/50 transition-all duration-300 hover:bg-background-secondary/80 cursor-pointer'
+            className='group bg-background-secondary border border-tertiary/15 rounded-xl overflow-hidden hover:border-tertiary/50 transition-all duration-300 hover:bg-background-secondary/80'
           >
             {/* Image */}
             <div className='relative overflow-hidden h-40 bg-tertiary/10'>

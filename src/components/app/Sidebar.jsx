@@ -118,7 +118,7 @@ const Sidebar = () => {
           <div className='w-full px-2'>
             <button
               onClick={() => logout().then(() => navigate('/login'))}
-              className='text-[color:var(--color-tertiary)] hover:text-rose-400 flex gap-3 items-center text-sm font-semibold transition-colors duration-200 group'
+              className='text-[color:var(--color-tertiary)] hover:text-rose-400 flex gap-3 items-center text-sm font-semibold transition-colors duration-200 group cursor-pointer'
             >
               <LogOut
                 size={18}

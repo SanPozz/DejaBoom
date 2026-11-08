@@ -37,6 +37,26 @@ const GameDetailSkeleton = () => (
           <Bone className="h-4 w-32" />
         </div>
       </div>
+
+      <div className="space-y-4">
+        <div className="flex items-baseline justify-between border-b border-zinc-900 pb-2">
+          <Bone className="h-3 w-32" />
+          <Bone className="h-3 w-12" />
+        </div>
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="border-b border-zinc-900/60 pb-4 space-y-2">
+            <div className="flex items-center gap-2">
+              <Bone className="size-5 shrink-0 rounded-full" />
+              <Bone className="h-3 w-24" />
+              <Bone className="h-3 w-16" />
+            </div>
+            <div className="space-y-2">
+              <Bone className="h-3 w-full" />
+              <Bone className="h-3 w-3/4" />
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
 
     <div className="space-y-4">

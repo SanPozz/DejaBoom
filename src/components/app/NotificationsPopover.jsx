@@ -116,7 +116,7 @@ export default function NotificationsPopover() {
         aria-expanded={isOpen}
         aria-haspopup="dialog"
         aria-label={`Notificaciones${unreadCount ? `, ${unreadCount} sin leer` : ""}`}
-        className="relative flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-left text-base font-sans text-[color:var(--color-tertiary)] transition-colors hover:bg-[color:var(--color-primary)]/5 hover:text-[color:var(--color-primary)] max-lg:w-[56px] max-lg:flex-col max-lg:gap-0.5 max-lg:px-1 max-lg:py-1 max-lg:text-[10px] max-lg:justify-center"
+        className="relative flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-left text-base font-sans text-[color:var(--color-tertiary)] transition-colors hover:bg-[color:var(--color-primary)]/5 hover:text-[color:var(--color-primary)] cursor-pointer max-lg:w-[56px] max-lg:flex-col max-lg:gap-0.5 max-lg:px-1 max-lg:py-1 max-lg:text-[10px] max-lg:justify-center"
       >
         <span className="relative flex h-5 w-5 items-center justify-center">
           <Bell size={20} />
@@ -157,7 +157,7 @@ export default function NotificationsPopover() {
                   onClick={() => setNotifications((current) => current.map((item) => ({ ...item, unread: false })))}
                   title="Marcar todas como leídas"
                   aria-label="Marcar todas como leídas"
-                  className="rounded-lg p-2 text-tertiary transition-colors hover:bg-white/[0.06] hover:text-primary"
+                  className="rounded-lg p-2 text-tertiary transition-colors hover:bg-white/[0.06] hover:text-primary cursor-pointer"
                 >
                   <CheckCheck size={17} />
                 </button>
@@ -169,7 +169,7 @@ export default function NotificationsPopover() {
                   setIsClosing(true)
                 }}
                 aria-label="Cerrar notificaciones"
-                className="rounded-lg p-2 text-tertiary transition-colors hover:bg-white/[0.06] hover:text-white"
+                className="rounded-lg p-2 text-tertiary transition-colors hover:bg-white/[0.06] hover:text-white cursor-pointer"
               >
                 <X size={17} />
               </button>
@@ -184,7 +184,7 @@ export default function NotificationsPopover() {
                   type="button"
                   key={notification.id}
                   onClick={() => markAsRead(notification.id)}
-                  className={`flex w-full items-start gap-3 border-b border-white/[0.05] px-4 py-3 text-left transition-colors hover:bg-white/[0.04] ${notification.unread ? "bg-white/[0.025]" : ""}`}
+                  className={`flex w-full items-start gap-3 border-b border-white/[0.05] px-4 py-3 text-left transition-colors hover:bg-white/[0.04] cursor-pointer ${notification.unread ? "bg-white/[0.025]" : ""}`}
                 >
                   <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-black ${notification.color}`}>
                     {notification.initial}
