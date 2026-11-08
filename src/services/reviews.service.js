@@ -1,47 +1,28 @@
-import axios from "axios";
-import { auth } from "../firebase";
 
-const API_URL = import.meta.env.VITE_API_URL;
+
+import api from "./api.service";
+
 
 export const getReviewById = async (id) => {
+
   try {
+  
+  const { data } = await api.get(`/reviews/${id}`);
+  return data;
 
-    const user = auth.currentUser;
-
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
-
-    const token = await user.getIdToken();
-
-    const response = await axios.get(`${API_URL}/reviews/${id}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
   } catch (error) {
-    console.error("Error fetching review by ID:", error);
+    console.error("Error getting review by ID:", error);
     throw error;
   }
 };
 
 export const createReview = async ({ gameId, rating, content, completed }) => {
   try {
-    const user = auth.currentUser;
+    
 
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
-
-    const token = await user.getIdToken();
-
-    const response = await axios.post(`${API_URL}/reviews/create`, { gameId, rating, content, completed }, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
+    const { data } = await api.post(`/reviews/create`, { gameId, rating, content, completed });
+    return data;
+    
   } catch (error) {
     console.error("Error creating review:", error);
     throw error;
@@ -50,20 +31,10 @@ export const createReview = async ({ gameId, rating, content, completed }) => {
 
 export const likeReview = async (reviewId) => {
   try {
-    const user = auth.currentUser;
 
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
+    const { data } = await api.put(`/reviews/like`, { reviewId });
+    return data;
 
-    const token = await user.getIdToken();
-
-    const response = await axios.put(`${API_URL}/reviews/like`, { reviewId }, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
   } catch (error) {
     console.error("Error liking review:", error);
     throw error;
@@ -72,20 +43,10 @@ export const likeReview = async (reviewId) => {
 
 export const unlikeReview = async (reviewId) => {
   try {
-    const user = auth.currentUser;
 
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
+    const { data } = await api.put(`/reviews/unlike`, { reviewId });
+    return data;
 
-    const token = await user.getIdToken();
-
-    const response = await axios.put(`${API_URL}/reviews/unlike`, { reviewId }, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data;
   } catch (error) {
     console.error("Error unliking review:", error);
     throw error;

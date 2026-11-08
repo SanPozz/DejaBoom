@@ -1,8 +1,8 @@
 import { createContext, useState, useEffect, useContext } from "react";
 import { signInWithPopup } from "firebase/auth";
 import { googleProvider } from "../firebase"; 
-import axios from "axios";
-const API_URL = import.meta.env.VITE_API_URL; 
+
+import { getMe } from "../services/auth.service";
 
 import {
     onAuthStateChanged,
@@ -31,17 +31,7 @@ export function AuthProvider({ children }) {
 
             try {
 
-                const token = await firebaseUser.getIdToken();
-
-                const { data } = await axios.get(
-                    `${API_URL}/auth/me`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                        },
-                    }
-                );
-                
+                const data = await getMe();
                 setUser(data);
                 
             } catch (error) {

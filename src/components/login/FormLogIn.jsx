@@ -1,9 +1,7 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext.jsx";
 
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL; 
+import { registerUser } from "../../services/auth.service.js";
 
 import { getAdditionalUserInfo } from "firebase/auth";
 
@@ -40,27 +38,17 @@ const FormLogIn = () => {
 
       console.log(additionalUserInfo);
 
-      const idToken = await response.user.getIdToken();
       const username = response.user.displayName;
 
       
       if (additionalUserInfo.isNewUser) {
-        const responseBackend = await axios.post(
-          `${API_URL}/auth/register`,
-          { username },
-          {
-            headers: {
-              Authorization: `Bearer ${idToken}`,
-            },
-          }
-        );
+        const responseBackend = await registerUser({ username });
 
-        if (responseBackend.status !== 200) {
-          console.log("Error conectando el usuario a la base de datos")
-          throw new Error('Failed to register new user in the backend');
-        }
+        console.log({
+          user_backend: responseBackend
+        });
         
-        navigate('/home?error=failed%20to%20connect%20user%20to%20backend');
+
       }
       
 

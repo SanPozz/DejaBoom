@@ -25,7 +25,7 @@ const ReviewModal = ({ isOpen, onClose, gameName, gameId }) => {
       handleClose()
     } catch (error) {
       alert(
-        error.message === "User not authenticated"
+        error.response?.status === 401
           ? "Debes iniciar sesión para enviar una reseña"
           : "Error al enviar la reseña"
       )

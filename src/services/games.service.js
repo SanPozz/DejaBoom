@@ -1,4 +1,5 @@
 import axios from "axios"
+import api from "./api.service"
 
 // IGDB devuelve la portada como miniatura (t_thumb, 90x128). Se reemplaza por un tamaño real:
 // t_cover_big (264x374) o t_cover_big_2x (528x748) para pantallas retina.
@@ -26,11 +27,11 @@ const toGame = (game) => ({
 
 export const searchGames = async (query, signal) => {
     try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/games/search`, {
+        const { data } = await api.get(`/games/search`, {
             params: { q: query },
             signal,
         });
-        return response.data.map(toGame);
+        return data.map(toGame);
     } catch (error) {
         if (axios.isCancel(error)) throw error;
         console.error("Error searching games:", error);
@@ -40,8 +41,8 @@ export const searchGames = async (query, signal) => {
 
 export const searchGameById = async (id) => {
     try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/games/${id}`);
-        return toGame(response.data);
+        const { data } = await api.get(`/games/${id}`);
+        return toGame(data);
     } catch (error) {
         console.error("Error fetching game by ID:", error);
         return null;
@@ -50,8 +51,8 @@ export const searchGameById = async (id) => {
 
 export const getSimilarGames = async (id) => {
     try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/games/${id}/similar`);
-        return response.data.map(toGame);
+        const { data } = await api.get(`/games/${id}/similar`);
+        return data.map(toGame);
     } catch (error) {
         console.error("Error fetching similar games:", error);
         return [];
@@ -60,8 +61,8 @@ export const getSimilarGames = async (id) => {
 
 export const getCommunityData = async (id) => {
     try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/games/${id}/community`);
-        return response.data;
+        const { data } = await api.get(`/games/${id}/community`);
+        return data;
     } catch (error) {
         console.error("Error fetching community data:", error);
         return null;
