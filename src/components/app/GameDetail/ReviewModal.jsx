@@ -63,8 +63,6 @@ const ReviewModal = ({ isOpen, onClose, gameName, gameId }) => {
         {/* Contenido */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
 
-          <input hidden type="text" name="gameId" id="gameId" value={gameId} />
-
           {/* Rating */}
           <div>
             <label className="block text-sm font-semibold text-secondary mb-3">
