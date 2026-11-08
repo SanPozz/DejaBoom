@@ -2,7 +2,7 @@ import { getCommunityData } from "../../../services/games.service"
 
 import { MessageSquare, Heart, Share2 } from "lucide-react"
 import { useEffect, useState } from "react"
-import ReviewModal from "./ReviewModal"
+import ReviewModal from "../ReviewModal"
 import TimeToBeatCard from "./TimeToBeatCard"
 
 const DerechaGameDetail = ({ gameName, gameId, timeToBeat }) => {
@@ -75,12 +75,14 @@ const DerechaGameDetail = ({ gameName, gameId, timeToBeat }) => {
         <TimeToBeatCard timeToBeat={timeToBeat} />
       </aside>
 
-      <ReviewModal
-        isOpen={isReviewModalOpen}
-        onClose={() => setIsReviewModalOpen(false)}
-        gameName={gameName}
-        gameId={gameId}
-      />
+      {isReviewModalOpen && (
+        <ReviewModal
+          game={{ id: gameId, title: gameName }}
+          onClose={() => setIsReviewModalOpen(false)}
+          // Actualiza los contadores de comunidad con la reseña nueva
+          onCreated={() => getCommunityData(gameId).then(setCommunityData)}
+        />
+      )}
     </>
   )
 }
