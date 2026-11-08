@@ -1,10 +1,22 @@
-import { MessageSquare, Heart, Share2 } from "lucide-react"
-import { useState } from "react"
-import ReviewModal from "./ReviewModal"
+import { getCommunityData } from "../../../services/games.service"
 
-const DerechaGameDetail = ({ gameName = "Juego" }) => {
+import { MessageSquare, Heart, Share2 } from "lucide-react"
+import { useEffect, useState } from "react"
+import ReviewModal from "../ReviewModal"
+import TimeToBeatCard from "./TimeToBeatCard"
+
+const DerechaGameDetail = ({ gameName, gameId, timeToBeat }) => {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false)
   const [isLiked, setIsLiked] = useState(false)
+  const [communityData, setCommunityData] = useState(null)
+
+  useEffect(() => {
+
+    getCommunityData(gameId)
+    .then((data) => setCommunityData(data))
+    .catch((error) => console.error("Error fetching community data:", error))
+    
+  }, [gameId])
 
   return (
     <>
@@ -12,7 +24,7 @@ const DerechaGameDetail = ({ gameName = "Juego" }) => {
         {/* Botón principal: Reseñar */}
         <button
           onClick={() => setIsReviewModalOpen(true)}
-          className="w-full px-6 py-3 bg-primary text-background rounded-xl font-semibold hover:bg-primary/90 btn-glow transition-all duration-300 flex items-center justify-center gap-2"
+          className="w-full px-6 py-3 bg-primary text-background rounded-xl font-semibold hover:bg-primary/90 btn-glow transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
         >
           <MessageSquare size={18} />
           Escribir reseña
@@ -22,7 +34,7 @@ const DerechaGameDetail = ({ gameName = "Juego" }) => {
         <div className="bg-background-secondary border border-tertiary/15 rounded-xl p-4 space-y-3">
           <button
             onClick={() => setIsLiked(!isLiked)}
-            className={`w-full px-4 py-2 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 ${
+            className={`w-full px-4 py-2 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer ${
               isLiked
                 ? "bg-rose-500/20 text-rose-400 border border-rose-500/30"
                 : "bg-tertiary/5 text-secondary border border-tertiary/30 hover:border-tertiary/50"
@@ -47,25 +59,30 @@ const DerechaGameDetail = ({ gameName = "Juego" }) => {
           <div className="space-y-2">
             <div className="flex justify-between items-center text-sm">
               <span className="text-tertiary">Reseñas</span>
-              <span className="font-bold text-primary">2.3K</span>
+              <span className="font-bold text-primary">{communityData?.reviewsCount ?? "?"}</span>
             </div>
             <div className="flex justify-between items-center text-sm">
               <span className="text-tertiary">En listas</span>
-              <span className="font-bold text-primary">5.1K</span>
+              <span className="font-bold text-primary">{communityData?.lists ?? "?"}</span>
             </div>
             <div className="flex justify-between items-center text-sm">
               <span className="text-tertiary">Completado</span>
-              <span className="font-bold text-primary">847</span>
+              <span className="font-bold text-primary">{communityData?.completedCount ?? "?"}</span>
             </div>
           </div>
         </div>
+
+        <TimeToBeatCard timeToBeat={timeToBeat} />
       </aside>
 
-      <ReviewModal
-        isOpen={isReviewModalOpen}
-        onClose={() => setIsReviewModalOpen(false)}
-        gameName={gameName}
-      />
+      {isReviewModalOpen && (
+        <ReviewModal
+          game={{ id: gameId, title: gameName }}
+          onClose={() => setIsReviewModalOpen(false)}
+          // Actualiza los contadores de comunidad con la reseña nueva
+          onCreated={() => getCommunityData(gameId).then(setCommunityData)}
+        />
+      )}
     </>
   )
 }

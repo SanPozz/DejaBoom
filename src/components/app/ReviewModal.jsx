@@ -1,78 +1,59 @@
 import { X } from "lucide-react"
 import { useState } from "react"
-import { auth } from "../../../firebase"
-import RatingStars from "./RatingStars"
-import axios from "axios"
+import RatingStars from "./GameDetail/RatingStars"
+import Checkbox from "./Checkbox"
+import GameSearchSelect from "./GameSearchSelect"
 
-const ReviewModal = ({ isOpen, onClose, gameName = "Juego", gameId = 1 }) => {
+import { createReview } from "../../services/reviews.service"
+import { getErrorMessage } from "../../services/api.service"
+
+// Montarlo solo cuando está abierto ({isOpen && <ReviewModal />}): al cerrarse se desmonta y el formulario se limpia solo.
+// - Con `game` ({ id, title }) reseña ese juego.
+// - Sin `game` muestra un buscador para elegirlo.
+const ReviewModal = ({ game, onClose, onCreated }) => {
+  const [selectedGame, setSelectedGame] = useState(game ?? null)
   const [rating, setRating] = useState(0)
   const [content, setContent] = useState("")
+  const [completed, setCompleted] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (!selectedGame) {
+      alert("Por favor selecciona un juego")
+      return
+    }
     if (rating === 0 || !content.trim()) {
       alert("Por favor completa la calificación y comentario")
       return
     }
 
     setIsSubmitting(true)
-
     try {
-
-      const user = auth.currentUser
-      if (!user) {
-        alert("Debes iniciar sesión para enviar una reseña")
-        setIsSubmitting(false)
-        return
-      }
-
-      const token = await user.getIdToken()
-
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/reviews/create`, {
-        gameName,
-        rating,
-        content,
-        gameId
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      
-      if (response.status === 200 || response.status === 201) {
-        alert("Reseña enviada exitosamente")
-        console.log(response.data)
-        setRating(0)
-        setContent("")
-        setIsSubmitting(false)
-        onClose()
-      }
-
+      const review = await createReview({ gameId: selectedGame.id, rating, content: content.trim(), completed })
+      alert("Reseña enviada exitosamente")
+      onCreated?.(review)
+      onClose()
     } catch (error) {
-      console.error(error)
-      alert("Error al enviar la reseña")
+      alert(
+        error.response?.status === 401
+          ? "Debes iniciar sesión para enviar una reseña"
+          : getErrorMessage(error, "Error al enviar la reseña")
+      )
       setIsSubmitting(false)
     }
-    
   }
-
-  const handleClose = () => {
-    setRating(0)
-    setContent("")
-    onClose()
-  }
-
-  if (!isOpen) return null
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="bg-background-secondary border border-primary/35 rounded-2xl max-w-md w-full shadow-[0_0_0_1px_rgba(103,228,91,0.08),0_24px_80px_rgba(0,0,0,0.65),0_0_36px_rgba(103,228,91,0.14)]">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-primary/20">
-          <h2 className="text-lg font-bold text-secondary">Reseña de {gameName}</h2>
+          <h2 className="text-lg font-bold text-secondary">
+            {game ? `Reseña de ${game.title}` : "Nueva reseña"}
+          </h2>
           <button
-            onClick={handleClose}
+            onClick={onClose}
             className="cursor-pointer p-2 hover:bg-primary/10 rounded-lg text-tertiary hover:text-primary transition-all"
             aria-label="Cerrar"
           >
@@ -82,8 +63,8 @@ const ReviewModal = ({ isOpen, onClose, gameName = "Juego", gameId = 1 }) => {
 
         {/* Contenido */}
         <form onSubmit={handleSubmit} className="p-6 space-y-5">
-
-          <input hidden type="text" name="gameId" id="gameId" value={gameId} />
+          {/* Selector de juego: solo si no vino uno */}
+          {!game && <GameSearchSelect value={selectedGame} onChange={setSelectedGame} />}
 
           {/* Rating */}
           <div>
@@ -93,12 +74,21 @@ const ReviewModal = ({ isOpen, onClose, gameName = "Juego", gameId = 1 }) => {
             <RatingStars rating={rating} onRatingChange={setRating} size="lg" />
           </div>
 
+          {/* Completado */}
+          <Checkbox
+            checked={completed}
+            onChange={setCompleted}
+            label="Lo completé"
+            description="Marcalo si terminaste el juego"
+          />
+
           {/* Comentario */}
           <div>
-            <label className="block text-sm font-semibold text-secondary mb-2">
+            <label htmlFor="review-content" className="block text-sm font-semibold text-secondary mb-2">
               Tu comentario
             </label>
             <textarea
+              id="review-content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Comparte tu experiencia con este juego..."
@@ -115,7 +105,7 @@ const ReviewModal = ({ isOpen, onClose, gameName = "Juego", gameId = 1 }) => {
           <div className="flex gap-3 pt-4">
             <button
               type="button"
-              onClick={handleClose}
+              onClick={onClose}
               className="cursor-pointer flex-1 px-4 py-2 rounded-lg border border-primary/30 text-secondary hover:border-primary hover:bg-primary/5 transition-all font-semibold"
             >
               Cancelar

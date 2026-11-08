@@ -8,44 +8,70 @@ import DerechaGameDetail from '../components/app/GameDetail/DerechaGameDetail';
 
 import SimilarGamesCarousel from '../components/app/GameDetail/SimilarGamesCarousel';
 
-import PopularListsSection from '../components/app/GameDetail/PopularListsSection';
-
-import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useParams } from 'react-router-dom';
-import { getCoverUrl } from '../services/games.service';
-
-const getCompanies = (game, role) =>
-  game?.involved_companies
-    ?.filter((item) => item[role])
-    .map((item) => item.company.name) ?? [];
+import PopularListsSection from "../components/app/GameDetail/PopularListsSection"
+import GameDetailSkeleton from "../components/app/GameDetail/GameDetailSkeleton"
+import { useEffect, useState } from "react"
+import { useParams } from "react-router-dom"
+import { searchGameById } from "../services/games.service"
 
 const GameDetail = () => {
-  const { id: gameId } = useParams();
-  const [game, setGame] = useState(null);
+
+  const { id: gameId } = useParams()
+  const [game, setGame] = useState(null)
+  const [loadedId, setLoadedId] = useState(null)
+  const loading = loadedId !== gameId
 
   useEffect(() => {
-    axios
-      .get(`${import.meta.env.VITE_API_URL}/games/${gameId}`)
-      .then((response) => {
-        console.log(response.data);
-        setGame(response.data);
-      })
-      .catch((error) => {
-        console.error('Error fetching game details:', error);
-      });
-  }, [gameId]);
+    let cancelled = false
+
+    window.scrollTo(0, 0)
+
+    searchGameById(gameId).then((result) => {
+      if (cancelled) return
+      setGame(result)
+      setLoadedId(gameId)
+    })
+
+
+
+    return () => {
+      cancelled = true
+    }
+  }, [gameId])
 
   return (
     <div className='flex w-full bg-background min-h-screen text-secondary font-sans antialiased'>
       <Sidebar />
 
-      <div className='flex-1 w-full overflow-y-auto'>
-        <main className='max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 xl:grid-cols-[220px_1fr_260px] gap-8 items-start'>
-          <GameCover
-            url={getCoverUrl(game?.cover?.url, 't_cover_big_2x')}
-            title={game?.name}
-          />
+        <Sidebar />
+
+        <div className="flex-1 w-full overflow-y-auto">
+
+            {loading ? <GameDetailSkeleton /> : (
+            <main className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 xl:grid-cols-[220px_1fr_260px] gap-8 items-start">
+
+                <GameCover url={game?.coverLarge} title={game?.title} />
+
+                <ColumnaCentro
+                   genres={game?.genres ?? []}
+                   platforms={game?.platforms ?? []}
+                   title={game?.title}
+                   releaseDate={game?.releaseDate?.toLocaleDateString("es-AR", { timeZone: "UTC" }) ?? ""}
+                   description={game?.description}
+                   studios={game?.developers ?? []}
+                   publishers={game?.publishers ?? []}
+                />
+
+                <DerechaGameDetail gameName={game?.title} gameId={game?.id} timeToBeat={game?.timeToBeat} />
+
+            </main>
+            )}
+
+            <SimilarGamesCarousel key={gameId} gameId={gameId} />
+
+            <PopularListsSection gameName={game?.title} />
+
+        </div>
 
           <ColumnaCentro
             genres={game?.genres?.map((genre) => genre.name) ?? []}

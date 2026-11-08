@@ -1,7 +1,7 @@
 import { Routes, Route } from "react-router-dom"
 import ReviewDetail from "../pages/ReviewDetail"
-import ProtectedRoute from "../components/ProtectedRoute"
-import PublicOnlyRoute from "../components/PublicOnlyRoute"
+import ProtectedRoute from "./ProtectedRoute"
+import PublicOnlyRoute from "./PublicOnlyRoute"
 
 import LandingPage from "../pages/LandingPage"
 

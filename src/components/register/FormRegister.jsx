@@ -1,8 +1,6 @@
 import { Link, useNavigate } from "react-router-dom"
 
-import axios from "axios";
-
-const API_URL = import.meta.env.VITE_API_URL; 
+import { registerUser } from "../../services/auth.service";
 
 import { useState } from "react";
 
@@ -20,26 +18,17 @@ const FormRegister = () => {
     try {
 
       const response = await register(email, password);
+      const responseBackend = await registerUser({ username }); 
       console.log({
         user_firebase: response.user,
         username,
         email
       });
 
-      const idToken = await response.user.getIdToken();
-
-      const responseBackend = await axios.post(
-        `${API_URL}/auth/register`,
-        { username },
-        {
-          headers: {
-            Authorization: `Bearer ${idToken}`,
-          },
-        }
-      );
+      
 
       console.log({
-        user_backend: responseBackend.data
+        user_backend: responseBackend
       });
 
       navigate('/login');

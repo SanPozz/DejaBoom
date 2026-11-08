@@ -7,7 +7,11 @@ const ProtectedRoute = ({ allowedRoles }) => {
 
     const location = useLocation();
 
-    if (loading) return <p>Cargando...</p> //Spinner
+    if (loading) return (
+        <div className="min-h-screen flex items-center justify-center bg-background" role="status" aria-label="Cargando">
+            <div className="size-10 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+        </div>
+    )
 
     if (!user) return <Navigate to="/login" state={{from: location}} replace />
 

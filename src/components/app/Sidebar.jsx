@@ -5,7 +5,7 @@ import { LogOut, Home, Compass, List, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import NotificationsPopover from './NotificationsPopover';
-import NewReviewModal from './NewReviewModal';
+import ReviewModal from './ReviewModal';
 
 const linksSidebar = [
   { name: 'Inicio', path: '/home', icon: <Home size={20} /> },
@@ -118,7 +118,7 @@ const Sidebar = () => {
           <div className='w-full px-2'>
             <button
               onClick={() => logout().then(() => navigate('/login'))}
-              className='text-[color:var(--color-tertiary)] hover:text-rose-400 flex gap-3 items-center text-sm font-semibold transition-colors duration-200 group'
+              className='text-[color:var(--color-tertiary)] hover:text-rose-400 flex gap-3 items-center text-sm font-semibold transition-colors duration-200 group cursor-pointer'
             >
               <LogOut
                 size={18}
@@ -130,10 +130,9 @@ const Sidebar = () => {
         </nav>
       </aside>
 
-      <NewReviewModal
-        isOpen={isNewReviewModalOpen}
-        onClose={() => setIsNewReviewModalOpen(false)}
-      />
+      {isNewReviewModalOpen && (
+        <ReviewModal onClose={() => setIsNewReviewModalOpen(false)} />
+      )}
     </>
   );
 };
