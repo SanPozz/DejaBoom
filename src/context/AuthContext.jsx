@@ -59,7 +59,7 @@ export function AuthProvider({ children }) {
     }
 
     const login = (email, password) => {
-        signInWithEmailAndPassword(auth, email, password);
+        return signInWithEmailAndPassword(auth, email, password);
     }
 
     const loginWithGoogle = () => {
