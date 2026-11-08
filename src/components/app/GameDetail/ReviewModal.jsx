@@ -2,7 +2,9 @@ import { X } from "lucide-react"
 import { useState } from "react"
 import RatingStars from "./RatingStars"
 import Checkbox from "../Checkbox"
+
 import { createReview } from "../../../services/reviews.service"
+import { getErrorMessage } from "../../../services/api.service"
 
 const ReviewModal = ({ isOpen, onClose, gameName, gameId }) => {
   const [rating, setRating] = useState(0)
@@ -27,7 +29,7 @@ const ReviewModal = ({ isOpen, onClose, gameName, gameId }) => {
       alert(
         error.response?.status === 401
           ? "Debes iniciar sesión para enviar una reseña"
-          : "Error al enviar la reseña"
+          : getErrorMessage(error, "Error al enviar la reseña")
       )
     } finally {
       setIsSubmitting(false)

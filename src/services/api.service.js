@@ -16,4 +16,9 @@ api.interceptors.request.use(async (config) => {
     return config
 })
 
+export const getErrorMessage = (error, fallback = "Ocurrió un error inesperado") => {
+    return error.response?.data?.error ?? fallback
+}
+
+
 export default api

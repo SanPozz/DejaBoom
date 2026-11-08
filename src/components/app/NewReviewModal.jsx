@@ -3,8 +3,11 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 import RatingStars from "./GameDetail/RatingStars"
 import Checkbox from "./Checkbox"
+
 import { searchGames } from "../../services/games.service"
 import { createReview } from "../../services/reviews.service"
+import { getErrorMessage } from "../../services/api.service"
+
 import { useDebounce } from "../../hooks/useDebounce"
 
 const MAX_RESULTS = 6
@@ -78,8 +81,8 @@ const NewReviewModal = ({ isOpen, onClose }) => {
       await createReview({ gameId: selectedGame.id, rating, content: comment.trim(), completed })
       alert("Reseña enviada exitosamente")
       handleClose()
-    } catch {
-      alert("Error al enviar la reseña")
+    } catch (error) {
+      alert(getErrorMessage(error, "Error al enviar la reseña"))
     } finally {
       setIsSubmitting(false)
     }
