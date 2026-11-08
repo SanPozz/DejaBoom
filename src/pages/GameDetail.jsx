@@ -66,7 +66,7 @@ const GameDetail = () => {
             </main>
             )}
 
-            <SimilarGamesCarousel key={gameId} gameId={gameId} />
+            <SimilarGamesCarousel key={gameId} games={game?.similarGames ?? []} loading={loading} />
 
             <PopularListsSection gameName={game?.title} />
 

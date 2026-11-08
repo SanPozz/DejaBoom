@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { Link } from "react-router-dom"
-import { getSimilarGames } from "../../../services/games.service"
 import Bone from "../Bone"
 
 const SimilarGamesSkeleton = () => (
@@ -30,26 +29,8 @@ const SimilarGamesSkeleton = () => (
   </div>
 )
 
-const SimilarGamesCarousel = ({ gameId }) => {
+const SimilarGamesCarousel = ({ games, loading }) => {
   const [currentIndex, setCurrentIndex] = useState(0)
-
-  // null = todavía cargando. getSimilarGames devuelve [] si falla, así que no queda trabado
-  const [similarGames, setSimilarGames] = useState(null)
-  const loading = similarGames === null
-  const games = similarGames ?? []
-
-  useEffect(() => {
-    if (!gameId) return
-
-    let cancelled = false
-    getSimilarGames(gameId).then((result) => {
-      if (!cancelled) setSimilarGames(result)
-    })
-
-    return () => {
-      cancelled = true
-    }
-  }, [gameId])
 
   const itemsPerView = 3
   const maxIndex = Math.max(0, games.length - itemsPerView)

@@ -23,6 +23,7 @@ const toGame = (game) => ({
     artwork: getCoverUrl(game.artworks?.[0]?.url, "t_1080p"),
     summary: game.summary ?? "",
     releaseDate: game.first_release_date ? new Date(game.first_release_date * 1000) : null,
+    similarGames: game.similar_games?.map(toGame) ?? [],
 })
 
 export const searchGames = async (query, signal) => {
@@ -46,16 +47,6 @@ export const searchGameById = async (id) => {
     } catch (error) {
         console.error("Error fetching game by ID:", error);
         return null;
-    }
-}
-
-export const getSimilarGames = async (id) => {
-    try {
-        const { data } = await api.get(`/games/${id}/similar`);
-        return data.map(toGame);
-    } catch (error) {
-        console.error("Error fetching similar games:", error);
-        return [];
     }
 }
 
