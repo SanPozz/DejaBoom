@@ -82,6 +82,8 @@ const ReviewDetail = () => {
   useEffect(() => {
     let cancelled = false;
 
+    window.scrollTo(0, 0);
+
     const fetchReview = async () => {
       setLoading(true);
       setGame(null);
