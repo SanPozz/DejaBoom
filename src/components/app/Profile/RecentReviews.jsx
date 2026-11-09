@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom"
 
+import ReviewStars from "../ReviewDetail/ReviewStars"
+
 
 export default function RecentReviews({ reviews }) {
   return (
@@ -24,16 +26,9 @@ export default function RecentReviews({ reviews }) {
                     {review.createdAt.toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' })}
                   </p>
                 </div>
-                <div className="flex gap-0.5 text-sm tracking-tighter">
-                  {Array.from({ length: 5 }).map((_, i) => (
-                    <span
-                      key={i}
-                      className={i < Math.floor(review.rating) ? "text-primary" : "text-tertiary/20"}
-                    >
-                      ★
-                    </span>
-                  ))}
-                </div>
+
+                <ReviewStars rating={review.rating} />
+
               </div>
               <p className="text-tertiary text-sm font-light leading-relaxed line-clamp-3">
                 {review.content}
