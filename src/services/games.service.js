@@ -9,7 +9,7 @@ export const getCoverUrl = (url, size = "t_cover_big") =>
 const getCompanies = (game, role) =>
     game.involved_companies?.filter((item) => item[role]).map((item) => item.company.name) ?? []
 
-const toGame = (game) => ({
+export const toGame = (game) => ({
     id: game.id,
     title: game.name,
     genres: game.genres?.map((genre) => genre.name) ?? [],

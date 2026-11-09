@@ -1,4 +1,3 @@
-import React from 'react'
 import { Link } from "react-router-dom"
 
 
@@ -11,41 +10,56 @@ export default function RecentReviews({ reviews }) {
 
       <div className="space-y-4">
         {reviews.map((review) => (
-          <div
-            key={review.id}
-            className="bg-background-secondary border border-tertiary/15 rounded-lg p-4 sm:p-6 hover:border-tertiary/40 transition-all duration-300"
+            <Link
+              to={`/review/${review.id}`}
+              key={review.id}
+              className="block bg-background-secondary border border-tertiary/15 rounded-lg p-4 sm:p-6 hover:border-tertiary/40 transition-all duration-300"
+            >
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
+                <div>
+                  <h3 className="font-bold text-secondary text-base sm:text-lg mb-1">
+                    {review.game?.title ?? 'Juego no disponible'}
+                  </h3>
+                  <p className="text-tertiary/60 text-xs">
+                    {review.createdAt.toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </p>
+                </div>
+                <div className="flex gap-0.5 text-sm tracking-tighter">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <span
+                      key={i}
+                      className={i < Math.floor(review.rating) ? "text-primary" : "text-tertiary/20"}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <p className="text-tertiary text-sm font-light leading-relaxed line-clamp-3">
+                {review.content}
+              </p>
+            </Link>
+        ))
+        
+        }
+
+        {reviews.length === 0 && (
+          <p className="text-tertiary text-sm font-light">
+            No hay reseñas recientes.
+          </p>
+        )}
+
+        {reviews.length > 0 && (
+          <Link
+            to="/profile/reviews"
+            className="mt-6 inline-block w-full sm:w-auto px-6 py-2 rounded-lg border border-primary text-primary font-semibold hover:bg-primary/10 transition-all text-xs uppercase tracking-wider text-center"
           >
-            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
-              <div>
-                <h3 className="font-bold text-secondary text-base sm:text-lg mb-1">
-                  {review.gameTitle}
-                </h3>
-                <p className="text-tertiary/60 text-xs">{review.date}</p>
-              </div>
-              <div className="flex gap-0.5 text-sm tracking-tighter">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <span
-                    key={i}
-                    className={i < Math.floor(review.rating) ? "text-primary" : "text-tertiary/20"}
-                  >
-                    ★
-                  </span>
-                ))}
-              </div>
-            </div>
-            <p className="text-tertiary text-sm font-light leading-relaxed line-clamp-3">
-              {review.text}
-            </p>
-          </div>
-        ))}
+            Ver Todas las Reseñas
+          </Link>
+        )}
       </div>
 
-      <Link
-        to="/profile/reviews"
-        className="mt-6 inline-block w-full sm:w-auto px-6 py-2 rounded-lg border border-primary text-primary font-semibold hover:bg-primary/10 transition-all text-xs uppercase tracking-wider text-center"
-      >
-        Ver Todas las Reseñas
-      </Link>
+      
     </div>
   )
 }

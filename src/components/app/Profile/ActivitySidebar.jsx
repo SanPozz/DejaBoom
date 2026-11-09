@@ -22,7 +22,7 @@ export default function ActivitySidebar({ joinedDate }) {
         <div>
           <p className="text-tertiary/70 mb-1">Miembro desde</p>
           <p className="text-secondary font-semibold">
-            {joinedDate}
+            {joinedDate.toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}
           </p>
         </div>
       </div>
