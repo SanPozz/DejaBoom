@@ -20,3 +20,13 @@ export const getProfile = async (nickname) => {
         throw error;
     }
 }
+
+export const updateProfile = async (updatedData) => {
+    try {
+        const { data } = await api.patch("/users/me", updatedData);
+        return data.user;
+    } catch (error) {
+        console.error("Error al actualizar perfil de usuario:", error);
+        throw error;
+    }
+}
