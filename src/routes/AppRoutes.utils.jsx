@@ -40,7 +40,7 @@ const AppRoutes = () => {
         <Route path="/lists/new" element={<ListForm />} />
         <Route path="/lists/:id/edit" element={<ListForm />} />
         <Route path="/lists/:id" element={<ListDetail />} />
-        <Route path="/profile/reviews" element={<AllReviews />} />
+        <Route path="/profile/:nickname/reviews" element={<AllReviews />} />
         <Route path="/review/:id" element={<ReviewDetail />} />
       </Route>
 

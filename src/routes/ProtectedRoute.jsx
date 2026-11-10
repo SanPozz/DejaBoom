@@ -1,6 +1,8 @@
 import { Navigate, useLocation, Outlet } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+import { Spinner } from "../components/app/Spinner";
+
 const ProtectedRoute = ({ allowedRoles }) => {
 
     const { user, loading, hasRole } = useAuth();
@@ -8,8 +10,8 @@ const ProtectedRoute = ({ allowedRoles }) => {
     const location = useLocation();
 
     if (loading) return (
-        <div className="min-h-screen flex items-center justify-center bg-background" role="status" aria-label="Cargando">
-            <div className="size-10 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+        <div className="min-h-screen flex items-center justify-center bg-background">
+            <Spinner />
         </div>
     )
 

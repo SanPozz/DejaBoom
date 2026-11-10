@@ -9,6 +9,7 @@ import ProfileStats from '../components/app/Profile/ProfileStats';
 import FavoriteGames from '../components/app/Profile/FavoriteGames';
 import RecentReviews from '../components/app/Profile/RecentReviews';
 import ActivitySidebar from '../components/app/Profile/ActivitySidebar';
+import { Spinner } from '../components/app/Spinner.jsx';
 import UserLists from '../components/app/Profile/UserLists';
 
 import { getProfile } from '../services/users.service.js';
@@ -94,7 +95,9 @@ const Profile = () => {
         )}
 
         {!error && !userProfile && (
-          <p className='max-w-5xl mx-auto px-6 py-16 text-center text-tertiary'>Cargando perfil...</p>
+          <div className='flex justify-center items-center min-h-screen'>
+            <Spinner />
+          </div>
         )}
 
         {userProfile && (
@@ -126,7 +129,7 @@ const Profile = () => {
               <FavoriteGames />
 
               <div className='grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12'>
-                <RecentReviews reviews={userProfile.recentReviews} />
+                <RecentReviews reviews={userProfile.recentReviews} nickname={userProfile.user?.nickname} />
                 <ActivitySidebar joinedDate={userProfile.user.createdAt} />
               </div>
 
