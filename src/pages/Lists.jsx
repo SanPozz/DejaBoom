@@ -1,43 +1,54 @@
 import { useEffect, useState } from 'react';
-import { BookmarkPlus, Gamepad2, Globe, Layers3, Lock } from 'lucide-react';
+import { Bookmark, BookmarkPlus, Gamepad2, Globe, Layers3, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../components/app/Sidebar';
 import SearchBar from '../components/app/SearchBar';
 import { Spinner } from '../components/app/Spinner.jsx';
 import { useAuth } from '../context/AuthContext';
-import { getUserLists } from '../services/lists.service';
+import { getSavedLists, getUserLists } from '../services/lists.service';
 import { getErrorMessage } from '../services/api.service';
 
+// "Guardadas" no filtra tus listas: muestra las de otros usuarios que guardaste
 const FILTERS = [
   { label: 'Todas', match: () => true },
   { label: 'Públicas', match: (list) => list.isPublic },
   { label: 'Privadas', match: (list) => !list.isPublic },
+  { label: 'Guardadas', saved: true },
 ];
+
+const EMPTY_MESSAGES = {
+  Todas: 'Todavía no creaste ninguna lista.',
+  Públicas: 'No tenés listas públicas.',
+  Privadas: 'No tenés listas privadas.',
+  Guardadas: 'Todavía no guardaste listas de otros usuarios.',
+};
 
 const Lists = () => {
   const { user } = useAuth();
-  const [lists, setLists] = useState(null);
+  const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [filter, setFilter] = useState(FILTERS[0]);
 
   useEffect(() => {
     let ignore = false;
 
-    getUserLists(user.nickname)
-      .then((data) => { if (!ignore) setLists(data); })
+    // Si fallan las guardadas, tus listas se muestran igual
+    Promise.all([getUserLists(user.nickname), getSavedLists().catch(() => [])])
+      .then(([lists, savedLists]) => { if (!ignore) setData({ lists, savedLists }); })
       .catch((err) => { if (!ignore) setError(getErrorMessage(err, 'No se pudieron cargar tus listas')); });
 
     return () => { ignore = true; };
   }, [user.nickname]);
 
-  const visibleLists = lists?.filter(filter.match) ?? [];
+  const lists = data?.lists;
+  const savedLists = data?.savedLists ?? [];
+  const visibleLists = filter.saved ? savedLists : lists?.filter(filter.match) ?? [];
   const totalGames = lists?.reduce((total, list) => total + list.gamesCount, 0) ?? 0;
-  const publicCount = lists?.filter((list) => list.isPublic).length ?? 0;
 
   const stats = [
     { icon: Layers3, label: 'Total', value: lists?.length ?? 0, detail: 'listas creadas' },
     { icon: Gamepad2, label: 'Juegos', value: totalGames, detail: 'en todas tus listas' },
-    { icon: Globe, label: 'Públicas', value: publicCount, detail: 'visibles para todos' },
+    { icon: Bookmark, label: 'Guardadas', value: savedLists.length, detail: 'listas de otros usuarios' },
   ];
 
   return (
@@ -89,7 +100,7 @@ const Lists = () => {
                   ))}
                 </div>
 
-                {lists.length === 0 ? (
+                {lists.length === 0 && savedLists.length === 0 ? (
                   <div className='rounded-2xl border border-dashed border-primary/25 bg-background-secondary/50 px-6 py-16 text-center'>
                     <p className='text-secondary font-semibold'>Todavía no creaste ninguna lista</p>
                     <p className='mt-1 text-sm text-tertiary'>Juntá tus juegos por tema, género o lo que se te ocurra.</p>
@@ -115,10 +126,10 @@ const Lists = () => {
                     </div>
 
                     {visibleLists.length === 0 ? (
-                      <p className='py-10 text-center text-sm text-tertiary'>No tenés listas {filter.label.toLowerCase()}.</p>
+                      <p className='py-10 text-center text-sm text-tertiary'>{EMPTY_MESSAGES[filter.label]}</p>
                     ) : (
                       <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6'>
-                        {visibleLists.map((list) => <ListCard key={list.id} list={list} />)}
+                        {visibleLists.map((list) => <ListCard key={list.id} list={list} showAuthor={filter.saved} />)}
                       </div>
                     )}
                   </>
@@ -132,7 +143,8 @@ const Lists = () => {
   );
 };
 
-function ListCard({ list }) {
+// En las guardadas se muestra el autor en lugar de la visibilidad, que siempre es pública
+function ListCard({ list, showAuthor }) {
   const VisibilityIcon = list.isPublic ? Globe : Lock;
 
   return (
@@ -140,9 +152,23 @@ function ListCard({ list }) {
       to={`/lists/${list.id}`}
       className='group flex flex-col bg-background-secondary border border-tertiary/15 rounded-2xl overflow-hidden hover:border-primary/35 transition-all duration-300'
     >
-      <div className='flex items-center gap-1.5 px-4 pt-4 text-[10px] font-bold uppercase tracking-[0.16em] text-tertiary'>
-        <VisibilityIcon size={12} />
-        {list.isPublic ? 'Pública' : 'Privada'}
+      <div className='flex items-center justify-between gap-2 px-4 pt-4 text-[10px] font-bold uppercase tracking-[0.16em] text-tertiary'>
+        {showAuthor ? (
+          <span className='truncate normal-case tracking-normal text-xs'>
+            por <span className='text-secondary'>{list.user.nickname}</span>
+          </span>
+        ) : (
+          <span className='flex items-center gap-1.5'>
+            <VisibilityIcon size={12} />
+            {list.isPublic ? 'Pública' : 'Privada'}
+          </span>
+        )}
+        {list.savedCount > 0 && (
+          <span className='flex shrink-0 items-center gap-1 text-primary' aria-label={`Guardada ${list.savedCount} veces`}>
+            <Bookmark size={12} className='fill-primary' />
+            {list.savedCount}
+          </span>
+        )}
       </div>
 
       <div className='flex-1 px-4 pb-3 pt-3'>

@@ -59,3 +59,42 @@ export const deleteList = async (listId) => {
         throw error;
     }
 }
+
+export const saveList = async (listId) => {
+    try {
+        await api.post(`/lists/${listId}/save`);
+    } catch (error) {
+        console.error("Error al guardar la lista:", error);
+        throw error;
+    }
+}
+
+export const unsaveList = async (listId) => {
+    try {
+        await api.post(`/lists/${listId}/unsave`);
+    } catch (error) {
+        console.error("Error al quitar la lista guardada:", error);
+        throw error;
+    }
+}
+
+export const getSavedLists = async () => {
+    try {
+        const { data } = await api.get(`/lists/saved`);
+        return data.map(toList);
+    } catch (error) {
+        console.error("Error al obtener las listas guardadas:", error);
+        throw error;
+    }
+}
+
+
+export const getPopularLists = async () => {
+    try {
+        const { data } = await api.get(`/lists/popular`);
+        return data.map(toList);
+    } catch (error) {
+        console.error("Error al obtener las listas populares:", error);
+        return [];
+    }
+}

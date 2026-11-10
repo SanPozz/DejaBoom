@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { ArrowLeft, CalendarClock, Gamepad2, Globe, History, Lock, Pencil, Trash2 } from 'lucide-react';
+import { ArrowLeft, Bookmark, CalendarClock, Gamepad2, Globe, History, Lock, Pencil, Trash2 } from 'lucide-react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import Sidebar from '../components/app/Sidebar';
 import SearchBar from '../components/app/SearchBar';
 import ListItem from '../components/app/ListItem';
 import { Spinner } from '../components/app/Spinner.jsx';
-import { deleteList, getListById } from '../services/lists.service';
+import { deleteList, getListById, saveList, unsaveList } from '../services/lists.service';
 import { getErrorMessage } from '../services/api.service';
 
 const formatDate = (date) => date.toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' });
@@ -19,6 +19,7 @@ const ListDetail = () => {
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState(null);
+  const [savePending, setSavePending] = useState(false);
 
   const isCurrent = result.id === id;
   const list = isCurrent ? result.list : null;
@@ -48,6 +49,38 @@ const ListDetail = () => {
     } catch (err) {
       setDeleteError(getErrorMessage(err, 'No se pudo eliminar la lista'));
       setDeleting(false);
+    }
+  };
+
+  const setSaved = (savedByMe) => {
+    setResult((current) => ({
+      ...current,
+      list: {
+        ...current.list,
+        savedByMe,
+        savedCount: current.list.savedCount + (savedByMe ? 1 : -1),
+      },
+    }));
+  };
+
+  // Se actualiza al toque y, si el pedido falla, se vuelve atrás
+  const handleToggleSave = async () => {
+    if (savePending) return;
+
+    const nextSaved = !list.savedByMe;
+    setSavePending(true);
+    setSaved(nextSaved);
+
+    try {
+      if (nextSaved) {
+        await saveList(id);
+      } else {
+        await unsaveList(id);
+      }
+    } catch {
+      setSaved(!nextSaved);
+    } finally {
+      setSavePending(false);
     }
   };
 
@@ -83,6 +116,7 @@ const ListDetail = () => {
 
   const stats = [
     { icon: Gamepad2, label: 'Juegos', value: list.games.length },
+    { icon: Bookmark, label: 'Guardada', value: `${list.savedCount} ${list.savedCount === 1 ? 'vez' : 'veces'}` },
     { icon: CalendarClock, label: 'Creada', value: formatDate(list.createdAt) },
     { icon: History, label: 'Actualizada', value: formatDate(list.updatedAt) },
   ];
@@ -137,7 +171,7 @@ const ListDetail = () => {
                 </div>
               </div>
 
-              <div className='grid grid-cols-1 sm:grid-cols-3 gap-4 p-5 sm:p-6'>
+              <div className='grid grid-cols-2 lg:grid-cols-4 gap-4 p-5 sm:p-6'>
                 {stats.map(({ icon: Icon, label, value }) => (
                   <div key={label} className='rounded-2xl border border-tertiary/15 bg-background/80 p-4'>
                     <div className='flex items-center gap-2 text-tertiary mb-2'>
@@ -164,6 +198,24 @@ const ListDetail = () => {
                 )}
                 Lista de <span className='font-bold text-secondary'>{list.user.nickname}</span>
               </Link>
+
+              {!list.isOwner && (
+                <button
+                  type='button'
+                  onClick={handleToggleSave}
+                  disabled={savePending}
+                  aria-pressed={list.savedByMe}
+                  className={`inline-flex items-center gap-2 font-bold px-4 py-2.5 rounded-xl transition-all active:scale-95 ${
+                    list.savedByMe
+                      ? 'border border-primary/50 bg-primary/10 text-primary hover:bg-primary/20'
+                      : 'bg-primary text-black hover:opacity-90 shadow-lg shadow-primary/20'
+                  }`}
+                >
+                  <Bookmark size={16} className={list.savedByMe ? 'fill-primary' : ''} />
+                  {list.savedByMe ? 'Guardada' : 'Guardar lista'}
+                  <span className={`text-xs ${list.savedByMe ? 'text-primary/70' : 'text-black/60'}`}>{list.savedCount}</span>
+                </button>
+              )}
 
               {list.isOwner && (
                 <div className='flex items-center gap-3 flex-wrap'>
