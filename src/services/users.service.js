@@ -15,7 +15,8 @@ export const getProfile = async (nickname) => {
         return {
             ...data,
             user: {...data.user, createdAt: new Date(data.user.createdAt)},
-            recentReviews: data.recentReviews?.map(toReview) ?? []
+            recentReviews: data.recentReviews?.map(toReview) ?? [],
+            favoriteGames: data.favoriteGames?.map(toGame) ?? []
         }
     } catch (error) {
         console.error("Error al buscar perfil de usuario:", error);
@@ -48,4 +49,14 @@ export const getUserReviews = async (nickname, { page, sort } = {}) => {
         throw error;
     }
 
+}
+
+export const updateFavoriteGames = async (gameIds) => {
+    try {
+        const { data } = await api.patch("/users/me/favorites", { gameIds });
+        return data.favoriteGames.map(toGame);
+    } catch (error) {
+        console.error("Error al actualizar juegos favoritos:", error);
+        throw error;
+    }
 }

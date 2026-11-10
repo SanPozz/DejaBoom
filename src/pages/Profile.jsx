@@ -126,7 +126,7 @@ const Profile = () => {
 
               <ProfileStats stats={stats} />
 
-              <FavoriteGames />
+              <FavoriteGames key={userProfile.user.id} games={userProfile.favoriteGames} isOwnProfile={isOwnProfile} />
 
               <div className='grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12'>
                 <RecentReviews reviews={userProfile.recentReviews} nickname={userProfile.user?.nickname} />
