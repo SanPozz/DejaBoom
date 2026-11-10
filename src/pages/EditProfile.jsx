@@ -185,7 +185,7 @@ const EditProfile = () => {
                     <div className='absolute inset-0 bg-linear-to-t from-background/80 to-transparent' />
                   </div>
                   <div className='px-4 pb-5'>
-                    <div className='-mt-0 mb-5 grid h-16 w-16 place-items-center overflow-hidden rounded-full border-4 border-background bg-background-secondary text-primary'>
+                    <div className='mt-0 mb-5 grid h-16 w-16 place-items-center overflow-hidden rounded-full border-4 border-background bg-background-secondary text-primary'>
                       {/* TODO: avatar elegido en el selector de imágenes
                       {profile.avatar ? (
                         <img
