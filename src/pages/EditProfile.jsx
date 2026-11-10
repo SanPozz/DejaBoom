@@ -1,30 +1,51 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+
 import { ArrowLeft, Image, Save, UserRound } from 'lucide-react';
+
 import { Link, useNavigate } from 'react-router-dom';
+
 import Sidebar from '../components/app/Sidebar';
 import SearchBar from '../components/app/SearchBar';
-import { getProfile, saveProfile } from '../utils/profileStorage';
+
+import { useAuth } from '../context/AuthContext';
+
+import { getProfile, updateProfile } from '../services/users.service';
+import { getErrorMessage } from '../services/api.service';
 
 const EditProfile = () => {
-  const [profile, setProfile] = useState(getProfile);
+  const [bio, setBio] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const { user } = useAuth();
   const navigate = useNavigate();
 
-  const updateField = (field, value) => {
-    setProfile((current) => ({ ...current, [field]: value }));
-  };
+  useEffect(() => {
 
-  const handleSubmit = (event) => {
+    let ignore = false;
+
+    getProfile(user.nickname)
+      .then((data) => {if (!ignore) setBio(data.user.bio ?? '')})
+      .catch((error) => {if (!ignore) setError(getErrorMessage(error, 'Error al obtener el perfil'))})
+      .finally(() => {if (!ignore) setLoading(false)})
+
+    return () => { ignore = true; };
+  }, [user.nickname])
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    const updatedProfile = {
-      ...profile,
-      name: profile.name.trim(),
-      username: profile.username.trim(),
-      bio: profile.bio.trim(),
-      avatar: profile.avatar.trim(),
-      bannerImage: profile.bannerImage.trim(),
-    };
-    saveProfile(updatedProfile);
-    navigate('/profile');
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      await updateProfile({ bio });
+      navigate(`/profile/${encodeURIComponent(user.nickname)}`);
+      
+    } catch (error) {
+      setError(getErrorMessage(error, 'Error al actualizar el perfil'));
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -63,26 +84,12 @@ const EditProfile = () => {
                   <h2 className='text-lg font-bold'>Información personal</h2>
                   <label className='block'>
                     <span className='mb-2 block text-sm font-semibold'>
-                      Nombre
-                    </span>
-                    <input
-                      required
-                      maxLength={60}
-                      value={profile.name}
-                      onChange={(event) =>
-                        updateField('name', event.target.value)
-                      }
-                      className='w-full rounded-lg border border-primary/25 bg-background-secondary px-4 py-3 text-sm outline-none transition focus:border-primary'
-                    />
-                  </label>
-                  <label className='block'>
-                    <span className='mb-2 block text-sm font-semibold'>
                       Nombre de usuario
                     </span>
                     <input
                       readOnly
                       aria-readonly='true'
-                      value={profile.username}
+                      value={user.nickname}
                       className='w-full cursor-not-allowed rounded-lg border border-primary/25 bg-background-secondary px-4 py-3 text-sm text-tertiary outline-none'
                     />
                   </label>
@@ -93,19 +100,19 @@ const EditProfile = () => {
                     <textarea
                       rows={4}
                       maxLength={240}
-                      value={profile.bio}
+                      value={bio}
                       onChange={(event) =>
-                        updateField('bio', event.target.value)
+                        setBio(event.target.value)
                       }
                       className='w-full resize-y rounded-lg border border-primary/25 bg-background-secondary px-4 py-3 text-sm outline-none transition focus:border-primary'
                     />
                     <span className='mt-1 block text-right text-xs text-tertiary'>
-                      {profile.bio.length}/240
+                      {bio.length}/240
                     </span>
                   </label>
                 </section>
 
-                <section className='space-y-5 border-b border-primary/20 pb-6'>
+                {/* <section className='space-y-5 border-b border-primary/20 pb-6'>
                   <h2 className='text-lg font-bold'>Imágenes</h2>
                   <label className='block'>
                     <span className='mb-2 block text-sm font-semibold'>
@@ -135,7 +142,9 @@ const EditProfile = () => {
                       className='w-full rounded-lg border border-primary/25 bg-background-secondary px-4 py-3 text-sm outline-none transition focus:border-primary'
                     />
                   </label>
-                </section>
+                </section> */}
+
+                {error && <p className='text-sm text-red-500'>{error}</p>}
 
                 <div className='flex flex-col-reverse gap-3 sm:flex-row sm:justify-end'>
                   <Link
@@ -146,10 +155,11 @@ const EditProfile = () => {
                   </Link>
                   <button
                     type='submit'
-                    className='inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-bold text-background transition hover:opacity-90'
+                    disabled={isSubmitting || loading}
+                    className='inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-bold text-background transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50'
                   >
                     <Save size={17} />
-                    Guardar cambios
+                    {isSubmitting ? 'Guardando...' : 'Guardar cambios'}
                   </button>
                 </div>
               </form>
@@ -161,6 +171,7 @@ const EditProfile = () => {
                 </div>
                 <div className='overflow-hidden border-y border-primary/20'>
                   <div className='relative h-24 bg-background-secondary'>
+                    {/* TODO: banner elegido en el selector de imágenes
                     {profile.bannerImage && (
                       <img
                         src={profile.bannerImage}
@@ -170,11 +181,12 @@ const EditProfile = () => {
                           event.currentTarget.classList.add('hidden')
                         }
                       />
-                    )}
+                    )} */}
                     <div className='absolute inset-0 bg-linear-to-t from-background/80 to-transparent' />
                   </div>
                   <div className='px-4 pb-5'>
-                    <div className='-mt-0 mb-5 grid h-16 w-16 place-items-center overflow-hidden rounded-full border-4 border-background bg-background-secondary text-primary'>
+                    <div className='mt-0 mb-5 grid h-16 w-16 place-items-center overflow-hidden rounded-full border-4 border-background bg-background-secondary text-primary'>
+                      {/* TODO: avatar elegido en el selector de imágenes
                       {profile.avatar ? (
                         <img
                           src={profile.avatar}
@@ -184,16 +196,16 @@ const EditProfile = () => {
                             event.currentTarget.classList.add('hidden')
                           }
                         />
-                      ) : (
+                      ) : ( */}
                         <UserRound size={28} />
-                      )}
+                      {/* )} */}
                     </div>
-                    <p className='font-bold'>{profile.name || 'Tu nombre'}</p>
-                    <p className='mt-1 text-sm font-semibold text-primary'>
+                    <p className='font-bold'>{user.nickname}</p>
+                    {/* <p className='mt-1 text-sm font-semibold text-primary'>
                       {profile.username || '@usuario'}
-                    </p>
+                    </p> */}
                     <p className='mt-3 whitespace-pre-wrap wrap-break-word text-sm text-tertiary'>
-                      {profile.bio || 'Tu biografía aparecerá aquí.'}
+                      {bio || 'Tu biografía aparecerá aquí.'}
                     </p>
                   </div>
                 </div>

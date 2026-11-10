@@ -1,46 +1,76 @@
-import { useState } from "react"
-import { Link } from "react-router-dom"
+import { useState, useEffect } from "react"
+import { useParams, Link, useSearchParams } from "react-router-dom"
+
+import { getUserReviews } from "../services/users.service.js"
+import { getErrorMessage } from "../services/api.service.js"
+
 import { ArrowLeft } from "lucide-react"
 import Sidebar from "../components/app/Sidebar"
-import { userReviews } from "../data/reviews"
-
-const Stars = ({ rating }) => (
-  <div className="flex gap-0.5 text-sm" aria-label={`${rating} de 5`}>
-    {Array.from({ length: 5 }).map((_, i) => {
-      const fill = Math.min(Math.max(rating - i, 0), 1) * 100
-      return (
-        <span key={i} className="relative text-tertiary/20">
-          ★
-          <span
-            className="absolute inset-0 overflow-hidden text-primary"
-            style={{ width: `${fill}%` }}
-          >
-            ★
-          </span>
-        </span>
-      )
-    })}
-  </div>
-)
-
-const sorters = {
-  recent: (a, b) => a.id - b.id,
-  best: (a, b) => b.rating - a.rating,
-  worst: (a, b) => a.rating - b.rating,
-}
+import ReviewCard from "../components/app/Profile/ReviewCard.jsx"
+import { Spinner } from "../components/app/Spinner.jsx"
 
 const AllReviews = () => {
-  const [sort, setSort] = useState("recent")
-  const reviews = [...userReviews].sort(sorters[sort])
+  const [reviews, setReviews] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [totalPages, setTotalPages] = useState(0);
+  const [error, setError] = useState(null);
+  
+  const { nickname } = useParams()
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const sort = searchParams.get("sort") ?? 'recent';
+  const page = Number(searchParams.get("page") ) || 1;
+
+  useEffect(() => {
+
+    let ignore = false;
+
+    getUserReviews(nickname, { sort, page })
+      .then((data) => {
+        if (!ignore) {
+          setReviews(data.reviews)
+          setTotalPages(data.totalPages)
+          setTotal(data.total)
+        }
+      })
+      .catch((err) => {
+        if (!ignore) {
+          setError(getErrorMessage(err, "No se pudieron cargar las reseñas"))
+        }
+      })
+      .finally(() => {
+        if (!ignore) {
+          setLoading(false)
+        }
+      })
+    return () => {
+      ignore = true;
+    }
+
+  }, [nickname, sort, page]);
+
+  const handleSortChange = (e) => {
+    setSearchParams({ sort: e.target.value })
+    setLoading(true)
+    setError(null)
+  }
+
+  const goToPage = (newPage) => {
+    setSearchParams({ sort, page: String(newPage) });
+    setLoading(true)
+    setError(null)
+    window.scrollTo(0, 0);
+  }
 
   return (
     <div className="flex w-full min-h-screen bg-background text-secondary font-sans antialiased">
       <Sidebar />
 
-      <main className="flex-1 px-4 sm:px-6 lg:px-8 py-8">
+      <main className="flex-1 min-w-0 px-4 sm:px-6 lg:px-8 pt-8 pb-28 lg:pb-8">
         <div className="max-w-4xl mx-auto">
           <Link
-            to="/profile"
+            to={`/profile/${encodeURIComponent(nickname)}`}
             className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-tertiary hover:text-primary transition-colors mb-6"
           >
             <ArrowLeft size={16} />
@@ -50,17 +80,17 @@ const AllReviews = () => {
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
             <div>
               <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-tertiary mb-2">
-                Perfil
+                {nickname}
               </p>
               <h1 className="text-3xl sm:text-4xl font-bold">
                 Todas las reseñas{" "}
-                <span className="text-tertiary/50 text-xl font-normal">({reviews.length})</span>
+                <span className="text-tertiary/50 text-xl font-normal">({total})</span>
               </h1>
             </div>
 
             <select
               value={sort}
-              onChange={(e) => setSort(e.target.value)}
+              onChange={handleSortChange}
               className="bg-background-secondary border border-tertiary/20 rounded-lg px-3 py-2 text-sm text-secondary focus:outline-none focus:border-primary"
             >
               <option value="recent">Más recientes</option>
@@ -70,23 +100,58 @@ const AllReviews = () => {
           </div>
 
           <div className="space-y-4">
-            {reviews.map((review) => (
-              <article
-                key={review.id}
-                className="bg-background-secondary border border-tertiary/15 rounded-lg p-4 sm:p-6 hover:border-tertiary/40 transition-all duration-300"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-3">
-                  <div>
-                    <h2 className="font-bold text-secondary text-base sm:text-lg mb-1">
-                      {review.gameTitle}
-                    </h2>
-                    <p className="text-tertiary/60 text-xs">{review.date}</p>
-                  </div>
-                  <Stars rating={review.rating} />
-                </div>
-                <p className="text-tertiary text-sm font-light leading-relaxed">{review.text}</p>
-              </article>
+
+            {error && <p className="text-red-500 text-sm">{error}</p>}
+
+            {loading && <Spinner />}
+
+            {!loading && reviews.map((review) => (
+              <ReviewCard key={review.id} review={review} lineClamp="line-clamp-4" />
             ))}
+
+            {!loading && !error && reviews.length === 0 && (
+              <p className="text-sm text-tertiary">No hay reseñas disponibles.</p>
+            )}
+
+            {!loading && totalPages > 1 && (
+              <nav className="mt-8 flex flex-wrap items-center justify-center gap-2" aria-label="Paginación">
+                <button
+                  type="button"
+                  onClick={() => goToPage(page - 1)}
+                  disabled={page <= 1}
+                  className="px-3 py-2 rounded-lg border border-tertiary/20 text-xs font-semibold uppercase tracking-wider text-tertiary hover:border-primary hover:text-primary transition-all cursor-pointer disabled:opacity-40 disabled:pointer-events-none"
+                >
+                  Anterior
+                </button>
+
+                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => goToPage(n)}
+                      aria-current={n === page ? "page" : undefined}
+                      className={`min-w-9 px-3 py-2 rounded-lg border text-sm font-semibold transition-all cursor-pointer ${
+                        n === page
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-tertiary/20 text-tertiary hover:border-primary hover:text-primary"
+                      }`}
+                    >
+                      {n}
+                    </button>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={() => goToPage(page + 1)}
+                    disabled={page >= totalPages}
+                    className="px-3 py-2 rounded-lg border border-tertiary/20 text-xs font-semibold uppercase tracking-wider text-tertiary hover:border-primary hover:text-primary transition-all cursor-pointer disabled:opacity-40 disabled:pointer-events-none"
+                    >
+                      Siguiente
+                  </button>
+              </nav>
+            )}
+
+
           </div>
         </div>
       </main>

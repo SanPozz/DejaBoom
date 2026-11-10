@@ -1,141 +1,71 @@
-import { BookmarkPlus, Check, Gamepad2, Sparkles } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Bookmark, BookmarkPlus, Gamepad2, Globe, Layers3, Lock } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Sidebar from '../components/app/Sidebar';
 import SearchBar from '../components/app/SearchBar';
-import { getSavedLists } from '../utils/listsStorage';
+import { Spinner } from '../components/app/Spinner.jsx';
+import { useAuth } from '../context/AuthContext';
+import { getSavedLists, getUserLists } from '../services/lists.service';
+import { getErrorMessage } from '../services/api.service';
 
-const myLists = [
-  {
-    id: 1,
-    title: 'Juegos que me hicieron llorar',
-    description: 'Títulos con historias que se quedan contigo días después.',
-    count: 12,
-    author: 'Tú',
-    visibility: 'Pública',
-    mood: 'Emocionales',
-    covers: [
-      'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1528819622761-bec1b7a8d4f8?auto=format&fit=crop&w=800&q=80',
-    ],
-  },
-  {
-    id: 2,
-    title: '100% recomendado',
-    description:
-      'Los mejores juegos para sugerirle a cualquiera en una charla.',
-    count: 18,
-    author: 'Tú',
-    visibility: 'Pública',
-    mood: 'Clásicos',
-    covers: [
-      'https://images.unsplash.com/photo-1511884642898-4c92249e20b6?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1526509867162-5f2ca1d7d460?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1592155931584-901ac15763e3?auto=format&fit=crop&w=800&q=80',
-    ],
-  },
-  {
-    id: 3,
-    title: 'Para jugar en la noche',
-    description: 'La mejor selección para tardes largas, calma y buena música.',
-    count: 9,
-    author: 'Tú',
-    visibility: 'Privada',
-    mood: 'Relax',
-    covers: [
-      'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1518655048521-f130df041f66?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80',
-    ],
-  },
-  {
-    id: 4,
-    title: 'GOTY candidates',
-    description:
-      'Mis apuestas para el mejor juego del año según lo que he probado.',
-    count: 15,
-    author: 'Tú',
-    visibility: 'Pública',
-    mood: 'Nuevos lanzamientos',
-    covers: [
-      'https://images.unsplash.com/photo-1528819622761-bec1b7a8d4f8?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1511884642898-4c92249e20b6?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80',
-    ],
-  },
-  {
-    id: 5,
-    title: 'Compañeros de co-op',
-    description:
-      'Juegos perfectos para jugar con amigos y compartir sesiones largas.',
-    count: 11,
-    author: 'Tú',
-    visibility: 'Pública',
-    mood: 'Cooperativos',
-    covers: [
-      'https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1526509867162-5f2ca1d7d460?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80',
-    ],
-  },
-  {
-    id: 6,
-    title: 'RPGs que cambiarán tu vida',
-    description: 'Historias largas, decisiones importantes y mundos enormes.',
-    count: 20,
-    author: 'Tú',
-    visibility: 'Pública',
-    mood: 'RPG',
-    covers: [
-      'https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1528819622761-bec1b7a8d4f8?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1592155931584-901ac15763e3?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=800&q=80',
-    ],
-  },
+// "Guardadas" no filtra tus listas: muestra las de otros usuarios que guardaste
+const FILTERS = [
+  { label: 'Todas', match: () => true },
+  { label: 'Públicas', match: (list) => list.isPublic },
+  { label: 'Privadas', match: (list) => !list.isPublic },
+  { label: 'Guardadas', saved: true },
 ];
 
-const filters = ['Todas', 'Públicas', 'Privadas', 'Favoritas'];
+const EMPTY_MESSAGES = {
+  Todas: 'Todavía no creaste ninguna lista.',
+  Públicas: 'No tenés listas públicas.',
+  Privadas: 'No tenés listas privadas.',
+  Guardadas: 'Todavía no guardaste listas de otros usuarios.',
+};
 
 const Lists = () => {
-  const savedLists = getSavedLists();
-  const lists = myLists
-    .map((list) => {
-      const savedList = savedLists.find(
-        (item) => String(item.id) === String(list.id),
-      );
-      return savedList ? { ...list, ...savedList } : list;
-    })
-    .concat(
-      savedLists.filter(
-        (list) => !myLists.some((item) => String(item.id) === String(list.id)),
-      ),
-    );
+  const { user } = useAuth();
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+  const [filter, setFilter] = useState(FILTERS[0]);
+
+  useEffect(() => {
+    let ignore = false;
+
+    // Si fallan las guardadas, tus listas se muestran igual
+    Promise.all([getUserLists(user.nickname), getSavedLists().catch(() => [])])
+      .then(([lists, savedLists]) => { if (!ignore) setData({ lists, savedLists }); })
+      .catch((err) => { if (!ignore) setError(getErrorMessage(err, 'No se pudieron cargar tus listas')); });
+
+    return () => { ignore = true; };
+  }, [user.nickname]);
+
+  const lists = data?.lists;
+  const savedLists = data?.savedLists ?? [];
+  const visibleLists = filter.saved ? savedLists : lists?.filter(filter.match) ?? [];
+  const totalGames = lists?.reduce((total, list) => total + list.gamesCount, 0) ?? 0;
+
+  const stats = [
+    { icon: Layers3, label: 'Total', value: lists?.length ?? 0, detail: 'listas creadas' },
+    { icon: Gamepad2, label: 'Juegos', value: totalGames, detail: 'en todas tus listas' },
+    { icon: Bookmark, label: 'Guardadas', value: savedLists.length, detail: 'listas de otros usuarios' },
+  ];
 
   return (
     <div className='flex w-full min-h-screen bg-background text-secondary'>
       <Sidebar />
 
-      <div className='flex-1 flex flex-col'>
+      <div className='flex-1 min-w-0 flex flex-col'>
         <header className='sticky top-0 z-30 bg-background/90 backdrop-blur-xl border-b border-tertiary/10'>
           <SearchBar />
         </header>
 
-        <main className='flex-1 px-4 sm:px-6 lg:px-8 py-8 pb-20 '>
+        <main className='flex-1 px-4 sm:px-6 lg:px-8 py-8 pb-20'>
           <div className='max-w-6xl mx-auto'>
             <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8'>
               <div>
-                <p className='text-[11px] font-bold uppercase tracking-[0.22em] text-tertiary mb-2'>
-                  Biblioteca
-                </p>
-                <h1 className='text-3xl sm:text-4xl font-bold text-secondary'>
-                  Mis Listas
-                </h1>
+                <p className='text-[11px] font-bold uppercase tracking-[0.22em] text-tertiary mb-2'>Biblioteca</p>
+                <h1 className='text-3xl sm:text-4xl font-bold text-secondary'>Mis Listas</h1>
               </div>
 
               <Link
@@ -147,130 +77,135 @@ const Lists = () => {
               </Link>
             </div>
 
-            <div className='grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8'>
-              <div className='bg-background-secondary border border-tertiary/15 rounded-2xl p-5'>
-                <div className='flex items-center gap-3 text-tertiary mb-3'>
-                  <Gamepad2
-                    size={18}
-                    className='text-primary'
-                  />
-                  <span className='text-xs uppercase tracking-[0.18em]'>
-                    Total
-                  </span>
-                </div>
-                <p className='text-3xl font-bold text-secondary'>
-                  {lists.length}
-                </p>
-                <p className='text-sm text-tertiary mt-1'>listas creadas</p>
+            {error && <p className='py-16 text-center text-tertiary'>{error}</p>}
+
+            {!error && !lists && (
+              <div className='flex justify-center py-16'>
+                <Spinner />
               </div>
+            )}
 
-              <div className='bg-background-secondary border border-tertiary/15 rounded-2xl p-5'>
-                <div className='flex items-center gap-3 text-tertiary mb-3'>
-                  <Check
-                    size={18}
-                    className='text-primary'
-                  />
-                  <span className='text-xs uppercase tracking-[0.18em]'>
-                    Completadas
-                  </span>
+            {lists && (
+              <>
+                <div className='grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8'>
+                  {stats.map(({ icon: Icon, label, value, detail }) => (
+                    <div key={label} className='bg-background-secondary border border-tertiary/15 rounded-2xl p-5'>
+                      <div className='flex items-center gap-3 text-tertiary mb-3'>
+                        <Icon size={18} className='text-primary' />
+                        <span className='text-xs uppercase tracking-[0.18em]'>{label}</span>
+                      </div>
+                      <p className='text-3xl font-bold text-secondary'>{value}</p>
+                      <p className='text-sm text-tertiary mt-1'>{detail}</p>
+                    </div>
+                  ))}
                 </div>
-                <p className='text-3xl font-bold text-secondary'>84</p>
-                <p className='text-sm text-tertiary mt-1'>juegos marcados</p>
-              </div>
 
-              <div className='bg-background-secondary border border-tertiary/15 rounded-2xl p-5'>
-                <div className='flex items-center gap-3 text-tertiary mb-3'>
-                  <Sparkles
-                    size={18}
-                    className='text-primary'
-                  />
-                  <span className='text-xs uppercase tracking-[0.18em]'>
-                    Favoritas
-                  </span>
-                </div>
-                <p className='text-3xl font-bold text-secondary'>6</p>
-                <p className='text-sm text-tertiary mt-1'>listas destacadas</p>
-              </div>
-            </div>
-
-            <div className='flex flex-wrap gap-2 mb-8'>
-              {filters.map((filter, index) => (
-                <button
-                  key={filter}
-                  className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-[0.14em] border transition-all ${
-                    index === 0
-                      ? 'bg-primary text-black border-primary'
-                      : 'border-tertiary/20 text-tertiary hover:border-primary/40 hover:text-secondary'
-                  }`}
-                >
-                  {filter}
-                </button>
-              ))}
-            </div>
-
-            <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6'>
-              {lists.map((list) => (
-                <article
-                  key={list.id}
-                  className='group bg-background-secondary border border-tertiary/15 rounded-2xl overflow-hidden hover:border-primary/35 transition-all duration-300'
-                >
-                  <div className='flex items-center justify-between px-4 pt-4'>
-                    <span className='text-[10px] font-bold uppercase tracking-[0.16em] text-tertiary'>
-                      {list.visibility}
-                    </span>
-                    <span className='text-[10px] font-semibold uppercase tracking-[0.14em] text-primary'>
-                      {list.mood}
-                    </span>
+                {lists.length === 0 && savedLists.length === 0 ? (
+                  <div className='rounded-2xl border border-dashed border-primary/25 bg-background-secondary/50 px-6 py-16 text-center'>
+                    <p className='text-secondary font-semibold'>Todavía no creaste ninguna lista</p>
+                    <p className='mt-1 text-sm text-tertiary'>Juntá tus juegos por tema, género o lo que se te ocurra.</p>
                   </div>
-
-                  <div className='px-4 pb-3 pt-3'>
-                    <div className='flex -space-x-4 mb-4 overflow-hidden'>
-                      {(list.covers ?? []).map((cover, index) => (
-                        <div
-                          key={`${list.id}-${index}`}
-                          className='w-16 h-20 rounded-lg overflow-hidden border-2 border-background-secondary ring-1 ring-white/5 shadow-lg shrink-0'
-                          style={{ zIndex: list.covers.length - index }}
+                ) : (
+                  <>
+                    <div className='flex flex-wrap gap-2 mb-8'>
+                      {FILTERS.map((item) => (
+                        <button
+                          key={item.label}
+                          type='button'
+                          onClick={() => setFilter(item)}
+                          aria-pressed={filter === item}
+                          className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-[0.14em] border transition-all ${
+                            filter === item
+                              ? 'bg-primary text-black border-primary'
+                              : 'border-tertiary/20 text-tertiary hover:border-primary/40 hover:text-secondary'
+                          }`}
                         >
-                          <img
-                            src={cover}
-                            alt={list.title}
-                            className='w-full h-full object-cover'
-                          />
-                        </div>
+                          {item.label}
+                        </button>
                       ))}
                     </div>
 
-                    <h2 className='text-xl font-bold text-secondary group-hover:text-primary transition-colors line-clamp-2 min-h-[3.2rem]'>
-                      {list.title}
-                    </h2>
-                    <p className='text-sm text-tertiary mt-2 leading-relaxed line-clamp-2 min-h-10'>
-                      {list.description}
-                    </p>
-                  </div>
-
-                  <div className='flex items-center justify-between px-4 pb-4 pt-1'>
-                    <div>
-                      <p className='text-xs text-tertiary'>por {list.author}</p>
-                      <p className='text-xs font-medium text-secondary mt-1'>
-                        {list.games?.length ?? list.count} juegos
-                      </p>
-                    </div>
-
-                    <Link
-                      to={`/lists/${list.id}`}
-                      className='text-xs font-bold uppercase tracking-[0.14em] text-primary hover:text-white transition-colors'
-                    >
-                      Ver lista
-                    </Link>
-                  </div>
-                </article>
-              ))}
-            </div>
+                    {visibleLists.length === 0 ? (
+                      <p className='py-10 text-center text-sm text-tertiary'>{EMPTY_MESSAGES[filter.label]}</p>
+                    ) : (
+                      <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6'>
+                        {visibleLists.map((list) => <ListCard key={list.id} list={list} showAuthor={filter.saved} />)}
+                      </div>
+                    )}
+                  </>
+                )}
+              </>
+            )}
           </div>
         </main>
       </div>
     </div>
   );
 };
+
+// En las guardadas se muestra el autor en lugar de la visibilidad, que siempre es pública
+function ListCard({ list, showAuthor }) {
+  const VisibilityIcon = list.isPublic ? Globe : Lock;
+
+  return (
+    <Link
+      to={`/lists/${list.id}`}
+      className='group flex flex-col bg-background-secondary border border-tertiary/15 rounded-2xl overflow-hidden hover:border-primary/35 transition-all duration-300'
+    >
+      <div className='flex items-center justify-between gap-2 px-4 pt-4 text-[10px] font-bold uppercase tracking-[0.16em] text-tertiary'>
+        {showAuthor ? (
+          <span className='truncate normal-case tracking-normal text-xs'>
+            por <span className='text-secondary'>{list.user.nickname}</span>
+          </span>
+        ) : (
+          <span className='flex items-center gap-1.5'>
+            <VisibilityIcon size={12} />
+            {list.isPublic ? 'Pública' : 'Privada'}
+          </span>
+        )}
+        {list.savedCount > 0 && (
+          <span className='flex shrink-0 items-center gap-1 text-primary' aria-label={`Guardada ${list.savedCount} veces`}>
+            <Bookmark size={12} className='fill-primary' />
+            {list.savedCount}
+          </span>
+        )}
+      </div>
+
+      <div className='flex-1 px-4 pb-3 pt-3'>
+        <div className='flex -space-x-4 mb-4 h-20'>
+          {list.covers.length > 0 ? (
+            list.covers.map((game, index) => (
+              <div
+                key={game.id}
+                className='w-16 h-20 rounded-lg overflow-hidden border-2 border-background-secondary ring-1 ring-white/5 shadow-lg shrink-0 bg-zinc-900'
+                style={{ zIndex: list.covers.length - index }}
+              >
+                {game.cover && <img src={game.cover} alt={game.title} className='w-full h-full object-cover' />}
+              </div>
+            ))
+          ) : (
+            <div className='grid w-16 h-20 place-items-center rounded-lg border border-dashed border-tertiary/25 text-tertiary'>
+              <Gamepad2 size={18} />
+            </div>
+          )}
+        </div>
+
+        <h2 className='text-xl font-bold text-secondary group-hover:text-primary transition-colors line-clamp-2 wrap-break-word'>
+          {list.title}
+        </h2>
+        {list.description && (
+          <p className='text-sm text-tertiary mt-2 leading-relaxed line-clamp-2 wrap-break-word'>{list.description}</p>
+        )}
+      </div>
+
+      <div className='flex items-center justify-between px-4 pb-4 pt-1 text-xs'>
+        <p className='font-medium text-secondary'>
+          {list.gamesCount} {list.gamesCount === 1 ? 'juego' : 'juegos'}
+        </p>
+        <p className='text-tertiary'>Actualizada el {list.updatedAt.toLocaleDateString('es-AR')}</p>
+      </div>
+    </Link>
+  );
+}
 
 export default Lists;

@@ -9,32 +9,12 @@ import ProfileStats from '../components/app/Profile/ProfileStats';
 import FavoriteGames from '../components/app/Profile/FavoriteGames';
 import RecentReviews from '../components/app/Profile/RecentReviews';
 import ActivitySidebar from '../components/app/Profile/ActivitySidebar';
+import { Spinner } from '../components/app/Spinner.jsx';
 import UserLists from '../components/app/Profile/UserLists';
 
 import { getProfile } from '../services/users.service.js';
+import { getUserLists } from '../services/lists.service.js';
 import { getErrorMessage } from '../services/api.service.js';
-
-
-const userLists = [
-  {
-    id: 1,
-    title: 'Mis Juegos Favoritos de RPG',
-    games: 12,
-    image: 'https://unsplash.com',
-  },
-  {
-    id: 2,
-    title: 'Juegos Indie que cambiaron mi vida',
-    games: 8,
-    image: 'https://unsplash.com',
-  },
-  {
-    id: 3,
-    title: 'Juegos Para Este Año',
-    games: 15,
-    image: 'https://unsplash.com',
-  },
-];
 
 const Profile = () => {
   const { nickname } = useParams();
@@ -43,9 +23,18 @@ const Profile = () => {
   const [userProfile, setUserProfile] = useState(null);
   const [error, setError] = useState(null);
 
+  // Se guarda el nickname con las listas para no mostrar las de otro perfil al navegar
+  const [listsResult, setListsResult] = useState({ nickname: null, lists: null });
+  const lists = listsResult.nickname === nickname ? listsResult.lists : null;
+
   useEffect(() => {
 
     let ignore = false;
+
+    // Si fallan las listas, el perfil se muestra igual
+    getUserLists(nickname)
+      .then((data) => { if (!ignore) setListsResult({ nickname, lists: data }); })
+      .catch(() => { if (!ignore) setListsResult({ nickname, lists: [] }); });
 
     getProfile(nickname)
       .then((data) => {if (!ignore) setUserProfile(data)})
@@ -74,7 +63,7 @@ const Profile = () => {
     },
     { icon: Bookmark,
       label: 'Listas', 
-      value: 28, 
+      value: lists?.length ?? '—',
       color: 'text-blue-400' 
     },
     { icon: Gamepad2, 
@@ -94,7 +83,9 @@ const Profile = () => {
         )}
 
         {!error && !userProfile && (
-          <p className='max-w-5xl mx-auto px-6 py-16 text-center text-tertiary'>Cargando perfil...</p>
+          <div className='flex justify-center items-center min-h-screen'>
+            <Spinner />
+          </div>
         )}
 
         {userProfile && (
@@ -123,14 +114,14 @@ const Profile = () => {
 
               <ProfileStats stats={stats} />
 
-              <FavoriteGames />
+              <FavoriteGames key={userProfile.user.id} games={userProfile.favoriteGames} isOwnProfile={isOwnProfile} />
 
               <div className='grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12'>
-                <RecentReviews reviews={userProfile.recentReviews} />
+                <RecentReviews reviews={userProfile.recentReviews} nickname={userProfile.user?.nickname} />
                 <ActivitySidebar joinedDate={userProfile.user.createdAt} />
               </div>
 
-              <UserLists lists={userLists} />
+              <UserLists lists={lists} isOwnProfile={isOwnProfile} nickname={userProfile.user.nickname} />
             </div>
           </>
         )}

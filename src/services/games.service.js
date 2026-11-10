@@ -59,3 +59,25 @@ export const getCommunityData = async (id) => {
         return null;
     }
 }
+
+export const getPopularGames = async () => {
+    try {
+        const { data } = await api.get(`/games/popular`);
+        return data.map(toGame);
+    } catch (error) {
+        console.error("Error fetching popular games:", error);
+        return [];
+    }
+}
+
+export const getGameOfTheWeek = async () => {
+    try {
+
+        const { data } = await api.get(`/games/game-of-the-week`);
+        return { game: toGame(data), stats: data.stats ?? null }
+        
+    } catch (error) {
+        console.error("Error fetching game of the week:", error);
+        return null;
+    }
+}

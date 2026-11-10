@@ -1,4 +1,4 @@
-
+import { toGame } from './games.service';
 
 import api from "./api.service";
 
@@ -49,6 +49,19 @@ export const unlikeReview = async (reviewId) => {
 
   } catch (error) {
     console.error("Error unliking review:", error);
+    throw error;
+  }
+};
+
+export const getPopularReviews = async () => {
+  try {
+    const { data } = await api.get(`/reviews/popular`);
+    return data.map((review) => ({
+      ...review,
+      game: review.game ? toGame(review.game) : null,
+    }));
+  } catch (error) {
+    console.error("Error getting popular reviews:", error);
     throw error;
   }
 };
