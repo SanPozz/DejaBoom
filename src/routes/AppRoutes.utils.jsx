@@ -2,6 +2,7 @@ import { Routes, Route } from "react-router-dom"
 import ReviewDetail from "../pages/ReviewDetail"
 import ProtectedRoute from "./ProtectedRoute"
 import PublicOnlyRoute from "./PublicOnlyRoute"
+import MyProfileRedirect from "./MyProfileRedirect"
 
 import LandingPage from "../pages/LandingPage"
 
@@ -32,7 +33,8 @@ const AppRoutes = () => {
       <Route element={<ProtectedRoute allowedRoles={['USER']} />}>
         <Route path="/home" element={<Home />} />
         <Route path="/game/:id" element={<GameDetail />} />
-        <Route path="/profile" element={<Profile />} />
+        <Route path="/profile" element={<MyProfileRedirect />} />
+        <Route path="/profile/:nickname" element={<Profile />} />
         <Route path="/profile/edit" element={<EditProfile />} />
         <Route path="/lists" element={<Lists />} />
         <Route path="/lists/new" element={<ListForm />} />

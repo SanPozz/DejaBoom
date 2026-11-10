@@ -59,7 +59,7 @@ const ReviewHeader = ({ review, cover, artwork, game }) => {
             <div className="w-8 h-8 rounded-full bg-emerald-500 flex items-center justify-center text-xs font-black text-black shrink-0 ring-2 ring-background-secondary">
               {review.user?.nickname.charAt(0).toUpperCase()}
             </div>
-            <Link to="/profile" className="text-sm font-bold text-secondary hover:text-primary transition-colors">{review.user?.nickname}</Link>
+            <Link to={`/profile/${encodeURIComponent(review.user?.nickname ?? '')}`} className="text-sm font-bold text-secondary hover:text-primary transition-colors">{review.user?.nickname}</Link>
             <span className="text-[11px] text-tertiary/60">· {new Date(review.createdAt).toLocaleDateString()}</span>
           </div>
 
